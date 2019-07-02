@@ -18,5 +18,9 @@ module.exports =  {
 	CATEGORY_SELECT_FAIL: "카테고리 호출 실패",
 
 	SAVE_SUCCESS: "저장 성공",
-	SAVE_FAIL: "저장 실패",
+    SAVE_FAIL: "저장 실패",
+    
+    ADD_ARTICLE_SUCCESS: "아티클 목록 성공",
+    LIST_ARTICLE_SUCCESS: "아티클 목록 성공",
+    MODIFY_ARTICLE_SUCCESS: "아티클 수정 성공"
 }
