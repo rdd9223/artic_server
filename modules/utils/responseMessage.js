@@ -12,5 +12,8 @@ module.exports =  {
     MISS_MATCH_PW: "비밀번호가 맞지 않습니다.",
     NULL_VALUE : "입력하세요",
     LOGIN_SUCCESS: "로그인 성공",
-    LOGIN_FAIL: "로그인 실패",
+	LOGIN_FAIL: "로그인 실패",
+	
+	CATEGORY_SELECT_SUCCESS: "카테고리 호출 성공",
+	CATEGORY_SELECT_FAIL: "카테고리 호출 실패",
 }
