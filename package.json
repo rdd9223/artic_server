@@ -10,12 +10,6 @@
     "crypto-promise": "^2.1.0",
     "debug": "^2.6.9",
     "express": "^4.16.4",
-<<<<<<< HEAD
-    "http-errors": "^1.6.3",
-    "jade": "~1.11.0",
-    "morgan": "^1.9.1",
-    "promise-mysql": "^4.0.4"
-=======
     "http-errors": "^1.7.3",
     "jade": "^1.11.0",
     "moment": "^2.24.0",
@@ -25,6 +19,5 @@
     "passport": "^0.4.0",
     "promise-mysql": "^3.3.2",
     "rand-token": "^0.4.0"
->>>>>>> 6648b3146f5124461e2bbb06becf9d8859c3cc45
   }
 }
