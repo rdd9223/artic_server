@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-router.use('/category', require('./category'));
+router.use('/', require('./category'));
 
 module.exports = router;
