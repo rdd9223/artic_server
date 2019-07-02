@@ -7,10 +7,17 @@
   },
   "dependencies": {
     "cookie-parser": "^1.4.4",
+    "crypto-promise": "^2.1.0",
     "debug": "^2.6.9",
     "express": "^4.16.4",
-    "http-errors": "^1.6.3",
-    "jade": "~1.11.0",
-    "morgan": "^1.9.1"
+    "http-errors": "^1.7.3",
+    "jade": "^1.11.0",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.25",
+    "mongoose": "^5.6.2",
+    "morgan": "^1.9.1",
+    "passport": "^0.4.0",
+    "promise-mysql": "^3.3.2",
+    "rand-token": "^0.4.0"
   }
 }
