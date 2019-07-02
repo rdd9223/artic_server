@@ -3,10 +3,10 @@ var router = express.Router();
 
 const passport = require('passport');
 
-const db = require('../../module/pool');
-const utils = require('../../module/utils/utils');
-const resMessage = require('../../module/utils/responseMessage');
-const statusCode = require('../../module/utils/statusCode');
+const db = require('../../modules/pool');
+const utils = require('../../modules/utils/utils');
+const resMessage = require('../../modules/utils/responseMessage');
+const statusCode = require('../../modules/utils/statusCode');
 
 // facebook 로그인
 router.get('/login/facebook',
