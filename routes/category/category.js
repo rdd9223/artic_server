@@ -16,4 +16,6 @@ router.get('/', async(req,res)=>{
 	} else {
 		res.status(200).send(defaultRes.successTrue(statusCode.CATEGORY_SELECT_SUCCESS, getAllcategoryResult));
 	}
-})
+});
+
+module.exports = router;
