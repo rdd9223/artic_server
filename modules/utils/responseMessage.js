@@ -12,7 +12,6 @@ module.exports =  {
     MISS_MATCH_PW: "비밀번호가 맞지 않습니다.",
     NULL_VALUE : "입력하세요",
     LOGIN_SUCCESS: "로그인 성공",
-<<<<<<< HEAD
     LOGIN_FAIL: "로그인 실패",
 
     HOME_NEW_SUCCESS : "홈 신규 아티클/아카이브 조회 성공",
@@ -21,14 +20,10 @@ module.exports =  {
     HOME_HISTORY_FAIL : "홈 히스토리 아티클 조회 실패",
     HOME_PICK_SUCESS : "홈 아틱의 선택 조회 성공",
     HOME_PICK_FAIL : "홈 아틱의 선택 조회 실패",
-
-=======
-	LOGIN_FAIL: "로그인 실패",
 	
 	CATEGORY_SELECT_SUCCESS: "카테고리 호출 성공",
 	CATEGORY_SELECT_FAIL: "카테고리 호출 실패",
 
 	SAVE_SUCCESS: "저장 성공",
 	SAVE_FAIL: "저장 실패",
->>>>>>> 2041e0d0224997e3b5a6b7098a8ffb4e0db1bb6e
 }

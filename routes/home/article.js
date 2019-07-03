@@ -22,19 +22,24 @@ router.get('/new', async(req,res)=>{
 router.get('/new/:article_idx', async(req,res)=>{
     const idx  = req.params.article_idx;
 
-    const getOneNewArticleQuery = 'SELECT archive_idx FROM archiveArticle WHERE article_idx = ?';
+    const getOneNewArticleQuery = 'SELECT * FROM archiveArticle WHERE article_idx = ?';
     const getOneNewArticleResult = await db.queryParam_Parse(getOneNewArticleQuery, [idx]);
     const archive_idx = getOneNewArticleResult[0].archive_idx
+    const article_idx = getOneNewArticleResult[0].article_idx
 
     const getOneNewArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ? ORDER BY date DESC limit 1';
     const getOneNewArchiveResult = await db.queryParam_Parse(getOneNewArchiveQuery, [archive_idx]);
     
+    const getOneArchiveQuery = 'SELECT * FROM article WHERE article_idx = ?'
+    const getOneArchiveResult = await db.queryParam_Parse(getOneArchiveQuery, [article_idx]);
+
     const newdata = {
-        OneNewArticle : getOneNewArticleResult,
-        OneNewArchive : getOneNewArchiveResult
+        //OneNewArticle : getOneNewArticleResult, //해당 article_idx의 archive_idx
+        Archive : getOneNewArchiveResult, //해당 아티클이 들어있는 아카이브
+        Articles : getOneArchiveResult //해당 아카이브에 들어있는 모든 아티클
     }
 
-	if(!getOneNewArticleResult || !getOneNewArchiveResult){
+	if(!getOneNewArticleResult || !getOneNewArchiveResult || !getOneArchiveResult){
         res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_NEW_FAIL));
 	} else {
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_NEW_SUCCESS, newdata));
