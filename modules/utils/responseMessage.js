@@ -25,5 +25,13 @@ module.exports =  {
 	CATEGORY_SELECT_FAIL: "카테고리 호출 실패",
 
 	SAVE_SUCCESS: "저장 성공",
-	SAVE_FAIL: "저장 실패",
+    SAVE_FAIL: "저장 실패",
+    
+    NOT_FIND_LIKE_CNT: "아티클 좋아요 갯수 실패",
+    NOT_FIND_ARCHIVE: "해당 아카이브 없음",
+    ADD_ARTICLE_SUCCESS: "아티클 등록 성공",
+    ADD_ARTICLE_FAIL: "아티클 등록 실패",
+    LIST_ARTICLE_SUCCESS: "아티클 목록 성공",
+    LIST_ARTICLE_FAIL: "아티클 목록 실패",
+    MODIFY_ARTICLE_SUCCESS: "아티클 수정 성공"
 }
