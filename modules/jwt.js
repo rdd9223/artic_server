@@ -4,7 +4,7 @@ const secretOrPrivateKey = "jwtSecretKey!";
 const options = {
     algorithm: "HS256",
     expiresIn: "1h",
-    issuer: "genie"
+    issuer: "artic"
 };
 // const refreshOptions = {
 //     algorithm: "HS256",

@@ -8,11 +8,6 @@ moment.tz.setDefault("Asia/Seoul");
 const boardSchema = new mongoose.Schema({
     title: { type: String, required: true},
     content: { type: String, required: true},
-    writer: { type: String, required: true},
-    date: Date,
-    hits: { type: Number, default: 0},
-    category: { type: Array, default: []},
-    comments: { type: Array, default: []},
 }, {
     versionKey: false,
 });
