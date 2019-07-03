@@ -13,7 +13,10 @@ const notificationSchema = new mongoose.Schema({
 });
 
 notificationSchema.statics.findByNotification = function(user_idx) {
-    return this.find({'user_idx' : user_idx});
+    return this.find({
+		'user_idx' : user_idx,
+		'article_idx' : article_idx,
+		'notification_type' : notification_type});
 };
 
 notificationSchema.pre('save', function() { 

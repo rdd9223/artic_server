@@ -26,5 +26,9 @@ module.exports =  {
     ADD_ARTICLE_FAIL: "아티클 등록 실패",
     LIST_ARTICLE_SUCCESS: "아티클 목록 성공",
     LIST_ARTICLE_FAIL: "아티클 목록 실패",
-    MODIFY_ARTICLE_SUCCESS: "아티클 수정 성공"
+	MODIFY_ARTICLE_SUCCESS: "아티클 수정 성공",
+	
+	EMPTY_TOKEN: "헤더에 토큰이 없음",
+	EXPRIED_TOKEN: "유효기간이 지난 토큰",
+	INVALID_TOKEN: "잘못된 토큰",
 }
