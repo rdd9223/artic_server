@@ -4,40 +4,78 @@ const utils = require('../../modules/utils/utils');
 const resMessage = require('../../modules/utils/responseMessage');
 const statusCode = require('../../modules/utils/statusCode');
 const db = require('../../modules/pool');
+const jwt = require('../../modules/jwt');
 
 // 아티클 등록
-router.post('/:archive_idx/article', async(req, res) => {
-    let articleIdx = req.params.archive_idx
+router.post('/:archive_idx/article', async (req, res) => {
+    let archiveIdx = req.params.archive_idx
     let title = req.body.article_title
     let thumnail = req.body.thumnail
     let link = req.body.link
 
-    let addArticleQuery = 'INSERT INTO article (article_title, thumnail, link, date)  VALUES (?, ?, ?, NOW())'
-    let result = await db.queryParam_Arr(addArticleQuery, [title, thumnail, link])
-    // let result = await db.queryParam_Arr(addArticleQuery, [articleResult])
+    let selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ?';
+    let addArticleQuery = 'INSERT INTO article (article_title, thumnail, link)  VALUES (?, ?, ?';
+    let addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx)  VALUES (?, ?)';
 
-    if(result === undefined) {
-        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE))
-    }else if(result == undefined) {
-        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE))
-    }else {
-        res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS))
+    let archiveResult = await db.queryParam_Arr(selectArchiveQuery, [archiveIdx]);
+
+    if (archiveResult.length == 0) {
+        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
+    } else {
+        const insertTransaction = await db.Transaction(async (connection) => {
+            const addArticleResult = await connection.query(addArticleQuery, [title, thumnail, link]);
+            const articleIdx = addArticleResult.insertId;
+            const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
+        });
+        if (insertTransaction === undefined) {
+            res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));
+        } else {
+            res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS));
+        }
     }
-})
+});
 
 // 아티클 목록 (신규 순)
 router.get('/:archive_idx/article', async (req, res) => {
-    let archiveIdx = req.params.archive_idx
-    let getArticlesQuery = 'SELECT a.* FROM artic.archiveArticle aa INNER JOIN artic.article a ON aa.article_idx = a.article_idx WHERE aa.archive_idx = ? ORDER BY date DESC'
-    let result = await db.queryParam_Arr(getArticlesQuery, [archiveIdx])
+    let archiveIdx = req.params.archive_idx;
+    let getArticlesQuery = 'SELECT a.* FROM archiveArticle aa INNER JOIN article a ON aa.article_idx = a.article_idx WHERE aa.archive_idx = ? ORDER BY date DESC';
+    let getLikeCntQuery = 'SELECT COUNT(article_idx) cnt FROM artic.like WHERE article_idx = ?';
+    let selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ?';
 
-    if(result === undefined) {
-        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE))
-    } else if(result == undefined) {
-        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE))
-    }
-    else {
-        res.status(200).send(utils.successTrue(statusCode.OK, resMessage.LIST_ARTICLE_SUCCESS, result))
+    let archiveResult = await db.queryParam_Arr(selectArchiveQuery, [archiveIdx]);
+
+    if (archiveResult.length == 0) {
+        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
+    } else {
+        let articleListResult = await db.queryParam_Arr(getArticlesQuery, [archiveIdx]);
+        // 토큰 받아서 like 유무 체크 필요
+        // try {
+        //     const decodedToken = jwt.verify(req.headers.token);
+        //     console.log(decodedToken);
+
+        //     if (decodedToken.grade == 0) {
+        //         res.status(200).send(utils.successFalse((statusCode.BAD_REQUEST, resMessage.NO_SELECT_AUTHORITY)));
+        //     } else {
+        //         res.status(200).send(utils.successTrue((statusCode.OK, resMessage.USER_SELECTED)));
+        //     }
+        // } catch (err) {
+        //     console.log(err);
+        // }
+        if (articleListResult === undefined) {
+            res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.LIST_ARTICLE_FAIL));
+        } else {
+            for (var i = 0, article; article = articleListResult[i]; i++) {
+                let articleIdx = article.article_idx;
+                let likeCntResult = await db.queryParam_Arr(getLikeCntQuery, [articleIdx]);
+
+                if (likeCntResult === undefined) {
+                    res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_LIKE_CNT));
+                } else {
+                    article.like_cnt = likeCntResult[0].cnt;
+                }
+            }
+            res.status(200).send(utils.successTrue(statusCode.OK, resMessage.LIST_ARTICLE_SUCCESS, articleListResult));
+        }
     }
 
 })
