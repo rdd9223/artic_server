@@ -6,6 +6,7 @@ const statusCode = require('../../modules/utils/statusCode');
 const db = require('../../modules/pool');
 const jwt = require('../../modules/jwt');
 
+// 아티클 읽기
 router.post('/:article_idx/history', async (req, res) => {
     const articleIdx = req.params.article_idx;
     
