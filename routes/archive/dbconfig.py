@@ -6,15 +6,20 @@ import sys
 
 # url입력 (나중엔 받아와야해)
 res = requests.get(sys.argv[1])
+link = sys.argv[1]
 soup = BeautifulSoup(res.content, 'html.parser')
-title = soup.find('title')
+title = str(soup.find('title').get_text()).strip()
 thumnail = soup.find('meta', {'property':'og:image'})
-output = thumnail['content']
+try:
+    output = thumnail['content']
+except TypeError:
+    output = "default_image_link"
+
 date = datetime.today().strftime("%Y/%m/%d %H:%M:%S")  # YYYY/mm/dd HH:MM:SS 형태의 시간 출력
 
-print(title.get_text())
+print(title)
 print(output)
-
+print(link)
 print(date) 
 # Connect to the database
 conn = pymysql.connect(host='artic.cvvhkxkqobt2.ap-northeast-2.rds.amazonaws.com',
@@ -24,8 +29,8 @@ conn = pymysql.connect(host='artic.cvvhkxkqobt2.ap-northeast-2.rds.amazonaws.com
                              charset='utf8')
 try:
     with conn.cursor() as cursor:
-        sql = 'INSERT INTO article (article_title, thumnail, date) VALUES (%s, %s, %s)'
-        cursor.execute(sql, (title.get_text(), output, date))
+        sql = 'INSERT INTO article (article_title, thumnail, link, date) VALUES (%s, %s, %s, %s)'
+        cursor.execute(sql, (title, output, link, date))
     conn.commit()
     print(cursor.lastrowid)
 finally:
