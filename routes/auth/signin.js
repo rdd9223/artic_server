@@ -6,7 +6,7 @@ const statusCode = require('../../modules/utils/statusCode');
 const db = require('../../modules/pool');
 const encrytion = require('../../modules/encrytion/encrytionModule');
 const jwt = require('../../modules/jwt');
-
+const secretOrPrivateKey = "articKey!";
 //로그인
 router.post('/', async(req, res) => {
     const id = req.body.id;
@@ -28,7 +28,7 @@ router.post('/', async(req, res) => {
             
             if (selectResult[0].user_pw == hashedPw.hashedPassword) {
                
-                const tokenValue = jwt.sign(req.body);
+                const tokenValue = jwt.sign(selectResult[0]);
                 //  const decodedJwt = jwt.verify(tokenValue.token);
                 //  console.log(decodedJwt); -> 토큰 확인할때 사용
                 res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.LOGIN_SUCCESS, tokenValue));

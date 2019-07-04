@@ -30,6 +30,7 @@ router.get('/new/:article_idx', async(req,res)=>{
 	} else {
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_NEW_SUCCESS, getOneNewArticleResult));
     }
+    //해당 아카이브에 있는 아티클
 
 });
 //최근 읽은 아티클
@@ -46,13 +47,13 @@ router.get('/history', async(req,res)=>{
 
 
 });
+
 //아틱의 선택 
-//나중에 구분  WHERE pick="동현";
 router.get('/pick', async(req,res)=>{
-	 const getArticlePickQuery = 'SELECT * FROM article';
+	 const getArticlePickQuery = 'SELECT * FROM article WHERE pick = 0';
 	 const getArticlePickResult = await db.queryParam_None(getArticlePickQuery);
 
-     if(!getNewArticleResult){
+     if(!getArticlePickResult){
         res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_PICK_FAIL));
 	} else {
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_PICK_SUCESS, getArticlePickResult));
