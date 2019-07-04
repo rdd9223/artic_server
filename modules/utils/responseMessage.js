@@ -51,5 +51,7 @@ module.exports =  {
 	NOT_FIND_USER: "해당하는 유저 없음",
 	FIND_USER_DATA: "유저 데이터 조회 성공",
 	UPDATE_USER_DATA_SUCCESS: "유저 정보 수정 성공",
-	UPDATE_USER_DATA_FAIL: "유저 정보 수정 실패"
+	UPDATE_USER_DATA_FAIL: "유저 정보 수정 실패",
+	NOT_FIND_MY_ARCHIVE: "내 아카이브 찾기 실패",
+	FIND_MY_ARCHIVE_SUCCESS: "내 아카이브 찾기 성공",
 }

@@ -34,8 +34,8 @@ router.put('/', authUtil.isLoggedin, async (req, res) => {
 	if (!img || !id || !intro || !name) {
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
 	} else {
-		const updateUserInfoQuery = "UPDATE user SET user_img = ?, user_id = ?, user_intro = ?, user_name = ? WHERE user_idx = ?";
-		const updateUserInfoResult = await db.queryParam_Arr(updateUserInfoQuery, [img, id, intro, name, req.decoded.idx]);
+		const updateUserInfoQuery = "UPDATE user SET user_img = ?, user_intro = ?, user_name = ? WHERE user_idx = ?";
+		const updateUserInfoResult = await db.queryParam_Arr(updateUserInfoQuery, [img, intro, name, req.decoded.idx]);
 
 		if (!updateUserInfoResult) {
 			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.UPDATE_USER_DATA_FAIL));
@@ -45,9 +45,26 @@ router.put('/', authUtil.isLoggedin, async (req, res) => {
 	}
 });
 
-router.get('/', authUtil.isLoggedin, async (req, res) => {
-	
+router.get('/archive/scrap', authUtil.isLoggedin, async (req, res) => {
+	// 토큰을 받아 사용자 인증을 한다
+	console.log(req.decoded.idx);
+
+	// archiveAdd 테이블에 user_idx에 해당하는 아카이브를 모두 조회한다, 해당하는 아카이브를 모두 가져온다
+	const findMyArchiveQuery = 'SELECT * FROM archive, archiveAdd WHERE archiveAdd.user_idx = ? AND archiveAdd.archive_idx = archive.archive_idx';
+	const findMyArchiveResult = await db.queryParam_Arr(findMyArchiveQuery,[req.decoded.idx]);
+
+	if(!findMyArchiveResult){
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_MY_ARCHIVE));
+	} else {
+		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_MY_ARCHIVE_SUCCESS));
+	}
 });
+
+router.get('/archive/mine', authUtil.isLoggedin, async (req, res) => {
+	const 
+})
+// 	let getArticlesQuery = 'SELECT a.* FROM archiveArticle aa INNER JOIN article a ON aa.article_idx = a.article_idx WHERE aa.archive_idx = ? ORDER BY date DESC';
+//  let getLikeCntQuery = 'SELECT COUNT(article_idx) cnt FROM artic.like WHERE article_idx = ?';
 // 토큰 받아서 like 유무 체크 필요
 // try {
 //     const decodedToken = jwt.verify(req.headers.token);
