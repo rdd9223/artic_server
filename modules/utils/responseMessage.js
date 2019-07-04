@@ -20,6 +20,9 @@ module.exports =  {
     HOME_HISTORY_FAIL : "홈 히스토리 아티클 조회 실패",
     HOME_PICK_SUCESS : "홈 아틱의 선택 조회 성공",
     HOME_PICK_FAIL : "홈 아틱의 선택 조회 실패",
+    HOME_CATE_SUCCESS : "홈 카테고리 별 조회 성공",
+    HOME_CATE_FAIL : "홈 카테고리 별 조회 실패",
+    HOME_CATE_EMPTY : "홈 존재하지 않는 카테고리",
 	
 	CATEGORY_SELECT_SUCCESS: "카테고리 호출 성공",
 	CATEGORY_SELECT_FAIL: "카테고리 호출 실패",
