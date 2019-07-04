@@ -7,9 +7,10 @@ const db = require('../../modules/pool');
 const jwt = require('../../modules/jwt');
 const PythonShell = require('python-shell');
 const authUtils = require('../../modules/utils/authUtils')
+const aws = require('aws-sdk');
+const upload = require('../../config/multer')
 var moment = require('moment');
 require('moment-timezone');
-const secretOrPrivateKey = "articKey!";
 
 // 아티클 등록
 router.post('/:archive_idx/article', async (req, res) => {
@@ -104,10 +105,10 @@ router.get('/:archive_idx/article', async (req, res) => {
     }
 })
 //아카이브 등록
-router.post('/', authUtils.isLoggedin , async (req, res) => {
+router.post('/', upload.single('archive_img') ,authUtils.isLoggedin , async (req, res) => {
     const user_idx = req.decoded.idx;
     const archive_title = req.body.title;
-    const archive_img = req.body.img;
+    const archive_img = req.file.location;
     const category_idx = req.body.category_idx;
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
