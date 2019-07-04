@@ -27,8 +27,9 @@ router.post('/', async(req, res) => {
             const hashedPw = await encrytion.onlyEncrytion(pw, selectResult[0].salt)
             
             if (selectResult[0].user_pw == hashedPw.hashedPassword) {
-               
-                const tokenValue = jwt.sign(req.body);
+				
+				const tokenValue = jwt.sign(selectResult[0])
+                //const tokenValue = jwt.sign(req.body);
                 //  const decodedJwt = jwt.verify(tokenValue.token);
                 //  console.log(decodedJwt); -> 토큰 확인할때 사용
                 res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.LOGIN_SUCCESS, tokenValue));
