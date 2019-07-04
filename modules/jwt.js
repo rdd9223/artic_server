@@ -15,7 +15,13 @@ const options = {
 module.exports = {
     sign: (user) => {
         const payload = { //회원 데이터 
+<<<<<<< HEAD
             idx: user.user_idx // 영우야 집중해 집중
+=======
+            idx: user.user_idx,
+            //grade: user.grade,
+            //name: user.user_name // 영우야 집중해 집중
+>>>>>>> 39c2f55ad2a3f0945091a9dba29e63e725ab1c51
         };
 
         const result = { //return 할 값

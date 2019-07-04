@@ -22,28 +22,15 @@ router.get('/new', async(req,res)=>{
 router.get('/new/:article_idx', async(req,res)=>{
     const idx  = req.params.article_idx;
 
-    const getOneNewArticleQuery = 'SELECT * FROM archiveArticle WHERE article_idx = ?';
+    const getOneNewArticleQuery = 'SELECT at.*, ac.archive_title FROM archiveArticle aa, article at, archive ac WHERE aa.article_idx = ? AND aa.archive_idx = ac.archive_idx ';
     const getOneNewArticleResult = await db.queryParam_Parse(getOneNewArticleQuery, [idx]);
-    const archive_idx = getOneNewArticleResult[0].archive_idx
-    const article_idx = getOneNewArticleResult[0].article_idx
 
-    const getOneNewArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ? ORDER BY date DESC limit 1';
-    const getOneNewArchiveResult = await db.queryParam_Parse(getOneNewArchiveQuery, [archive_idx]);
-    
-    const getOneArchiveQuery = 'SELECT * FROM article WHERE article_idx = ?'
-    const getOneArchiveResult = await db.queryParam_Parse(getOneArchiveQuery, [article_idx]);
-
-    const newdata = {
-        //OneNewArticle : getOneNewArticleResult, //해당 article_idx의 archive_idx
-        Archive : getOneNewArchiveResult, //해당 아티클이 들어있는 아카이브
-        Articles : getOneArchiveResult //해당 아카이브에 들어있는 모든 아티클
-    }
-
-	if(!getOneNewArticleResult || !getOneNewArchiveResult || !getOneArchiveResult){
+	if(!getOneNewArticleResult){
         res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_NEW_FAIL));
 	} else {
-		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_NEW_SUCCESS, newdata));
+		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_NEW_SUCCESS, getOneNewArticleResult));
     }
+    //해당 아카이브에 있는 아티클
 
 });
 //최근 읽은 아티클
@@ -60,13 +47,13 @@ router.get('/history', async(req,res)=>{
 
 
 });
+
 //아틱의 선택 
-//나중에 구분  WHERE pick="동현";
 router.get('/pick', async(req,res)=>{
-	 const getArticlePickQuery = 'SELECT * FROM article';
+	 const getArticlePickQuery = 'SELECT * FROM article WHERE pick = 0';
 	 const getArticlePickResult = await db.queryParam_None(getArticlePickQuery);
 
-     if(!getNewArticleResult){
+     if(!getArticlePickResult){
         res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_PICK_FAIL));
 	} else {
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_PICK_SUCESS, getArticlePickResult));

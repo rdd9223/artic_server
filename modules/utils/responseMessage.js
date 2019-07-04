@@ -20,6 +20,9 @@ module.exports =  {
     HOME_HISTORY_FAIL : "홈 히스토리 아티클 조회 실패",
     HOME_PICK_SUCESS : "홈 아틱의 선택 조회 성공",
     HOME_PICK_FAIL : "홈 아틱의 선택 조회 실패",
+    HOME_CATE_SUCCESS : "홈 카테고리 별 조회 성공",
+    HOME_CATE_FAIL : "홈 카테고리 별 조회 실패",
+    HOME_CATE_EMPTY : "홈 존재하지 않는 카테고리",
 	
 	CATEGORY_SELECT_SUCCESS: "카테고리 호출 성공",
 	CATEGORY_SELECT_FAIL: "카테고리 호출 실패",
@@ -46,6 +49,21 @@ module.exports =  {
     DELETE_ARTICLE_FAIL: "아티클 삭제 실패",
     READ_ARTICLE_SUCCESS: "아티클 읽기 성공",
     READ_ARTICLE_FAIL: "아티클 읽기 실패",
+<<<<<<< HEAD
+=======
+
+    REGISTER_ARCHIVE_SUCCESS : "아카이브 등록 성공",
+    REGISTER_ARCHIVE_FAIL : "아카이브 등록 실패",
+    REGISTER_ARCHIVE_UNOPENED : "아카이브 등록 필수값 미입력",
+    ARCHIVE_LIST_SUCCESS : "아카이브 조회 성공",
+    ARCHIVE_LIST_FAIL : "아카이브 조회 실패",
+    UPDATE_ARCHIVE_SUCCESS : "아카이브 수정 성공",
+    UPDATE_ARCHIVE_FAIL : "아카이브 수정 실패",
+    UPDATE_ARCHIVE_UNOPENED : "아카이브 수정 필수값 미입력",
+    DELETE_ARCHIVE_SUCCESS : "아카이브 삭제 성공",
+    DELETE_ARCHIVE_FAIL : "아카이브 삭제 실패",
+
+>>>>>>> 39c2f55ad2a3f0945091a9dba29e63e725ab1c51
 
 	NOT_FIND_IDX: "유저의 인덱스 없음",
 	NOT_FIND_USER: "해당하는 유저 없음",
