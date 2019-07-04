@@ -17,7 +17,7 @@ module.exports = {
         const payload = { //회원 데이터 
             idx: user.user_idx,
             //grade: user.grade,
-            name: user.user_name // 영우야 집중해 집중
+            //name: user.user_name // 영우야 집중해 집중
         };
 
         const result = { //return 할 값
