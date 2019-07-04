@@ -33,5 +33,13 @@ module.exports =  {
     ADD_ARTICLE_FAIL: "아티클 등록 실패",
     LIST_ARTICLE_SUCCESS: "아티클 목록 성공",
     LIST_ARTICLE_FAIL: "아티클 목록 실패",
-    MODIFY_ARTICLE_SUCCESS: "아티클 수정 성공"
+    UPDATE_ARTICLE_SUCCESS: "아티클 수정 성공",
+    UPDATE_ARTICLE_FAIL: "아티클 수정 실패",
+    NOT_FIND_ARTICLE: "해당 아티클 없음",
+    DELETE_ARTICLE_SUCCESS: "아티클 삭제 성공",
+    DELETE_ARTICLE_FAIL: "아티클 삭제 실패",
+    READ_ARTICLE_SUCCESS: "아티클 읽기 성공",
+    READ_ARTICLE_FAIL: "아티클 읽기 실패"
+
+    
 }
