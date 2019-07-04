@@ -50,18 +50,26 @@ router.get('/archive/scrap', authUtil.isLoggedin, async (req, res) => {
 	console.log(req.decoded.idx);
 
 	// archiveAdd 테이블에 user_idx에 해당하는 아카이브를 모두 조회한다, 해당하는 아카이브를 모두 가져온다
-	const findMyArchiveQuery = 'SELECT * FROM archive, archiveAdd WHERE archiveAdd.user_idx = ? AND archiveAdd.archive_idx = archive.archive_idx';
-	const findMyArchiveResult = await db.queryParam_Arr(findMyArchiveQuery,[req.decoded.idx]);
+	const findScrapArchiveQuery = 'SELECT * FROM archive, archiveAdd WHERE archiveAdd.user_idx = ? AND archiveAdd.archive_idx = archive.archive_idx';
+	const findScrapArchiveResult = await db.queryParam_Arr(findScrapArchiveQuery,[req.decoded.idx]);
 
-	if(!findMyArchiveResult){
+	if(!findScrapArchiveResult){
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_MY_ARCHIVE));
 	} else {
-		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_MY_ARCHIVE_SUCCESS));
+		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_MY_ARCHIVE_SUCCESS,findScrapArchiveResult));
 	}
 });
 
 router.get('/archive/mine', authUtil.isLoggedin, async (req, res) => {
-	const 
+	
+	const findMyArchiveQuery = 'SELECT * FROM archive WHERE user_idx = ?';
+	const findMyArchiveResult = await db.queryParam_Arr(findMyArchiveQuery, [req.decoded.idx]);
+
+	if(!findMyArchiveResult){
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
+	} else {
+		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_MY_ARCHIVE_SUCCESS, findMyArchiveResult));
+	}
 })
 // 	let getArticlesQuery = 'SELECT a.* FROM archiveArticle aa INNER JOIN article a ON aa.article_idx = a.article_idx WHERE aa.archive_idx = ? ORDER BY date DESC';
 //  let getLikeCntQuery = 'SELECT COUNT(article_idx) cnt FROM artic.like WHERE article_idx = ?';
