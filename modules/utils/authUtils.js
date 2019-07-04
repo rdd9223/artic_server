@@ -16,7 +16,7 @@ const authUtil = {
 				return res.json(util.successFalse(statusCode.UNAUTHORIZED, resMessage.EXPRIED_TOKEN));
 			}else if (user == -2){
 				return res.json(util.successFalse(statusCode.UNAUTHORIZED, resMessage.INVALID_TOKEN));
-			}else{
+			}else{ 
 				req.decoded = user;
 				next();
 			}
