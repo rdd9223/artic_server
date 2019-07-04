@@ -11,21 +11,43 @@ const authUtil = require('../../modules/utils/authUtils');
 // 마이페이지 조회
 router.get('/', authUtil.isLoggedin, async (req, res) => {
 	console.log(req.decoded);
-	const decodedUserIdx = req.decoded.idx;
-
-	if (!decodedUserId) {
-		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.EMPTY_ID));
+	if (!req.decoded.idx) {
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_IDX));
 	} else {
-		const getUserInfoQuery = 'SELECT * FROM user WHERE useridx=?';
-		const getUserInfoResult = await db.queryParam_Parse(getUserInfoQuery, decodedUserId);
+		const getUserInfoQuery = 'SELECT * FROM user WHERE user_idx=?';
+		const getUserInfoResult = await db.queryParam_Parse(getUserInfoQuery, [req.decoded.idx]);
 
-		if(!getUserInfoResult){
-			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NO_USER));
-		} else{
-
+		if (!getUserInfoResult) {
+			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_USER));
+		} else {
+			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_USER_DATA, getUserInfoResult));
 		}
 	}
-})
+});
+
+router.put('/', authUtil.isLoggedin, async (req, res) => {
+	const img = req.body.img;
+	const id = req.body.id;
+	const intro = req.body.intro;
+	const name = req.body.name;
+
+	if (!img || !id || !intro || !name) {
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
+	} else {
+		const updateUserInfoQuery = "UPDATE user SET user_img = ?, user_id = ?, user_intro = ?, user_name = ? WHERE user_idx = ?";
+		const updateUserInfoResult = await db.queryParam_Arr(updateUserInfoQuery, [img, id, intro, name, req.decoded.idx]);
+
+		if (!updateUserInfoResult) {
+			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.UPDATE_USER_DATA_FAIL));
+		} else {
+			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.UPDATE_USER_DATA_SUCCESS, updateUserInfoResult));
+		}
+	}
+});
+
+router.get('/', authUtil.isLoggedin, async (req, res) => {
+	
+});
 // 토큰 받아서 like 유무 체크 필요
 // try {
 //     const decodedToken = jwt.verify(req.headers.token);

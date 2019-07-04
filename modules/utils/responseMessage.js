@@ -47,5 +47,9 @@ module.exports =  {
     READ_ARTICLE_SUCCESS: "아티클 읽기 성공",
     READ_ARTICLE_FAIL: "아티클 읽기 실패",
 
-    EMPTY_ID: "빈 아이디",
+	NOT_FIND_IDX: "유저의 인덱스 없음",
+	NOT_FIND_USER: "해당하는 유저 없음",
+	FIND_USER_DATA: "유저 데이터 조회 성공",
+	UPDATE_USER_DATA_SUCCESS: "유저 정보 수정 성공",
+	UPDATE_USER_DATA_FAIL: "유저 정보 수정 실패"
 }
