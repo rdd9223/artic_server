@@ -49,8 +49,6 @@ module.exports =  {
     DELETE_ARTICLE_FAIL: "아티클 삭제 실패",
     READ_ARTICLE_SUCCESS: "아티클 읽기 성공",
     READ_ARTICLE_FAIL: "아티클 읽기 실패",
-<<<<<<< HEAD
-=======
 
     REGISTER_ARCHIVE_SUCCESS : "아카이브 등록 성공",
     REGISTER_ARCHIVE_FAIL : "아카이브 등록 실패",
@@ -62,8 +60,6 @@ module.exports =  {
     UPDATE_ARCHIVE_UNOPENED : "아카이브 수정 필수값 미입력",
     DELETE_ARCHIVE_SUCCESS : "아카이브 삭제 성공",
     DELETE_ARCHIVE_FAIL : "아카이브 삭제 실패",
-
->>>>>>> 39c2f55ad2a3f0945091a9dba29e63e725ab1c51
 
 	NOT_FIND_IDX: "유저의 인덱스 없음",
 	NOT_FIND_USER: "해당하는 유저 없음",
