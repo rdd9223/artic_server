@@ -70,4 +70,8 @@ module.exports =  {
 	UPDATE_USER_DATA_FAIL: "유저 정보 수정 실패",
 	NOT_FIND_MY_ARCHIVE: "내 아카이브 찾기 실패",
 	FIND_MY_ARCHIVE_SUCCESS: "내 아카이브 찾기 성공",
+	DELETE_ADD_ARCHIVE_FAIL: "아카이브 담기 취소 실패",
+	DELETE_ADD_ARCHIVE_SUCCESS: "아카이브 담기 취소 성공",
+	INSERT_ADD_ARCHIVE_FAIL: "아카이브 담기 실패",
+	INSERT_ADD_ARCHIVE_SUCCESS: "아카이브 담기 성공",
 }
