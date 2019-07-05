@@ -41,7 +41,7 @@ module.exports =  {
 	EMPTY_TOKEN: "헤더에 토큰이 없음",
 	EXPRIED_TOKEN: "유효기간이 지난 토큰",
 	INVALID_TOKEN: "잘못된 토큰",
-	
+
     UPDATE_ARTICLE_SUCCESS: "아티클 수정 성공",
     UPDATE_ARTICLE_FAIL: "아티클 수정 실패",
     NOT_FIND_ARTICLE: "해당 아티클 없음",
@@ -49,6 +49,8 @@ module.exports =  {
     DELETE_ARTICLE_FAIL: "아티클 삭제 실패",
     READ_ARTICLE_SUCCESS: "아티클 읽기 성공",
     READ_ARTICLE_FAIL: "아티클 읽기 실패",
+<<<<<<< HEAD
+=======
 
     REGISTER_ARCHIVE_SUCCESS : "아카이브 등록 성공",
     REGISTER_ARCHIVE_FAIL : "아카이브 등록 실패",
@@ -61,6 +63,13 @@ module.exports =  {
     DELETE_ARCHIVE_SUCCESS : "아카이브 삭제 성공",
     DELETE_ARCHIVE_FAIL : "아카이브 삭제 실패",
 
+>>>>>>> 39c2f55ad2a3f0945091a9dba29e63e725ab1c51
 
-    
+	NOT_FIND_IDX: "유저의 인덱스 없음",
+	NOT_FIND_USER: "해당하는 유저 없음",
+	FIND_USER_DATA: "유저 데이터 조회 성공",
+	UPDATE_USER_DATA_SUCCESS: "유저 정보 수정 성공",
+	UPDATE_USER_DATA_FAIL: "유저 정보 수정 실패",
+	NOT_FIND_MY_ARCHIVE: "내 아카이브 찾기 실패",
+	FIND_MY_ARCHIVE_SUCCESS: "내 아카이브 찾기 성공",
 }
