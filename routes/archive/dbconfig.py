@@ -13,7 +13,7 @@ thumnail = soup.find('meta', {'property':'og:image'})
 try:
     output = thumnail['content']
 except TypeError:
-    output = "default_image_link"
+    output = "https://hyeongbucket.s3.ap-northeast-2.amazonaws.com/kwon.jpg"
 
 date = datetime.today().strftime("%Y/%m/%d %H:%M:%S")  # YYYY/mm/dd HH:MM:SS 형태의 시간 출력
 
