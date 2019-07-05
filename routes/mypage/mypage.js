@@ -70,21 +70,6 @@ router.get('/archive/mine', authUtil.isLoggedin, async (req, res) => {
 	} else {
 		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_MY_ARCHIVE_SUCCESS, findMyArchiveResult));
 	}
-})
-// 	let getArticlesQuery = 'SELECT a.* FROM archiveArticle aa INNER JOIN article a ON aa.article_idx = a.article_idx WHERE aa.archive_idx = ? ORDER BY date DESC';
-//  let getLikeCntQuery = 'SELECT COUNT(article_idx) cnt FROM artic.like WHERE article_idx = ?';
-// 토큰 받아서 like 유무 체크 필요
-// try {
-//     const decodedToken = jwt.verify(req.headers.token);
-//     console.log(decodedToken);
-
-//     if (decodedToken.grade == 0) {
-//         res.status(200).send(utils.successFalse((statusCode.BAD_REQUEST, resMessage.NO_SELECT_AUTHORITY)));
-//     } else {
-//         res.status(200).send(utils.successTrue((statusCode.OK, resMessage.USER_SELECTED)));
-//     }
-// } catch (err) {
-//     console.log(err);
-// }
+});
 
 module.exports = router;
