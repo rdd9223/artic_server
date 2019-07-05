@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 const secretOrPrivateKey = "jwtSecretKey!";
 const options = {
     algorithm: "HS256",
-    expiresIn: "1h",
-    issuer: "genie"
+    expiresIn: "24h",
+    issuer: "artic"
 };
 // const refreshOptions = {
 //     algorithm: "HS256",
@@ -15,9 +15,7 @@ const options = {
 module.exports = {
     sign: (user) => {
         const payload = { //회원 데이터 
-            idx: user.idx,
-            grade: user.grade,
-            name: user.name
+            idx: user.user_idx // 영우야 집중해 집중
         };
 
         const result = { //return 할 값

@@ -12,7 +12,17 @@ module.exports =  {
     MISS_MATCH_PW: "비밀번호가 맞지 않습니다.",
     NULL_VALUE : "입력하세요",
     LOGIN_SUCCESS: "로그인 성공",
-	LOGIN_FAIL: "로그인 실패",
+    LOGIN_FAIL: "로그인 실패",
+
+    HOME_NEW_SUCCESS : "홈 신규 아티클/아카이브 조회 성공",
+    HOME_NEW_FAIL : "홈 신규 아티클/아카이브 조회 실패",
+    HOME_HISTORY_SUCESS : "홈 히스토리 아티클 조회 성공",
+    HOME_HISTORY_FAIL : "홈 히스토리 아티클 조회 실패",
+    HOME_PICK_SUCESS : "홈 아틱의 선택 조회 성공",
+    HOME_PICK_FAIL : "홈 아틱의 선택 조회 실패",
+    HOME_CATE_SUCCESS : "홈 카테고리 별 조회 성공",
+    HOME_CATE_FAIL : "홈 카테고리 별 조회 실패",
+    HOME_CATE_EMPTY : "홈 존재하지 않는 카테고리",
 	
 	CATEGORY_SELECT_SUCCESS: "카테고리 호출 성공",
 	CATEGORY_SELECT_FAIL: "카테고리 호출 실패",
@@ -26,6 +36,12 @@ module.exports =  {
     ADD_ARTICLE_FAIL: "아티클 등록 실패",
     LIST_ARTICLE_SUCCESS: "아티클 목록 성공",
     LIST_ARTICLE_FAIL: "아티클 목록 실패",
+	MODIFY_ARTICLE_SUCCESS: "아티클 수정 성공",
+	
+	EMPTY_TOKEN: "헤더에 토큰이 없음",
+	EXPRIED_TOKEN: "유효기간이 지난 토큰",
+	INVALID_TOKEN: "잘못된 토큰",
+
     UPDATE_ARTICLE_SUCCESS: "아티클 수정 성공",
     UPDATE_ARTICLE_FAIL: "아티클 수정 실패",
     NOT_FIND_ARTICLE: "해당 아티클 없음",
@@ -37,4 +53,23 @@ module.exports =  {
     LIKE_ARTICLE_FAIL: "아티클 좋아요 실패",
     UNLIKE_ARTICLE_SUCCESS: "아티클 좋아요 취소 성공",
     UNLIKE_ARTICLE_FAIL: "아티클 좋아요 취소 실패"
+
+    REGISTER_ARCHIVE_SUCCESS : "아카이브 등록 성공",
+    REGISTER_ARCHIVE_FAIL : "아카이브 등록 실패",
+    REGISTER_ARCHIVE_UNOPENED : "아카이브 등록 필수값 미입력",
+    ARCHIVE_LIST_SUCCESS : "아카이브 조회 성공",
+    ARCHIVE_LIST_FAIL : "아카이브 조회 실패",
+    UPDATE_ARCHIVE_SUCCESS : "아카이브 수정 성공",
+    UPDATE_ARCHIVE_FAIL : "아카이브 수정 실패",
+    UPDATE_ARCHIVE_UNOPENED : "아카이브 수정 필수값 미입력",
+    DELETE_ARCHIVE_SUCCESS : "아카이브 삭제 성공",
+    DELETE_ARCHIVE_FAIL : "아카이브 삭제 실패",
+
+	NOT_FIND_IDX: "유저의 인덱스 없음",
+	NOT_FIND_USER: "해당하는 유저 없음",
+	FIND_USER_DATA: "유저 데이터 조회 성공",
+	UPDATE_USER_DATA_SUCCESS: "유저 정보 수정 성공",
+	UPDATE_USER_DATA_FAIL: "유저 정보 수정 실패",
+	NOT_FIND_MY_ARCHIVE: "내 아카이브 찾기 실패",
+	FIND_MY_ARCHIVE_SUCCESS: "내 아카이브 찾기 성공",
 }
