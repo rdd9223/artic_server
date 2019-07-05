@@ -18,7 +18,7 @@ router.get('/new', async (req, res) => {
 	}
 });
 // 신규 아카이브 하나보기
-//아카이브 스크랩여부, 아티클 좋아요/담기여부 만 추가하면됨
+//아카이브 스크랩 여부, 아티클 좋아요/담기여부 만 추가하면됨
 router.get('/new/:archive_idx', async (req, res) => {
 	const idx = req.params.archive_idx;
 

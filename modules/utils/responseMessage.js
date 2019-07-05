@@ -7,10 +7,11 @@ module.exports =  {
     CREATED_USER_FAIL: "회원 가입 성공",
     DELETE_USER: "회원 탈퇴 성공",
 
-    ALREADY_USER: "이미 회원입니다.",
+    ALREADY_USER: "이미 존재하는 아이디입니다.",
     NO_USER: "존재하지 않는 회원입니다.",
     MISS_MATCH_PW: "비밀번호가 맞지 않습니다.",
-    NULL_VALUE : "입력하세요",
+    NULL_VALUE : "아이디 / 비밀번호 입력하세요",
+    SIGNUP_NULL_VALUE : "필수 정보들을 입력하세요",
     LOGIN_SUCCESS: "로그인 성공",
     LOGIN_FAIL: "로그인 실패",
 
@@ -59,6 +60,7 @@ module.exports =  {
     UPDATE_ARCHIVE_FAIL : "아카이브 수정 실패",
     UPDATE_ARCHIVE_UNOPENED : "아카이브 수정 필수값 미입력",
     DELETE_ARCHIVE_SUCCESS : "아카이브 삭제 성공",
+    NO_DELETE_AUTHORITY : "아카이브 삭제 권한 없음",
     DELETE_ARCHIVE_FAIL : "아카이브 삭제 실패",
 
 	NOT_FIND_IDX: "유저의 인덱스 없음",
