@@ -9,7 +9,6 @@ const PythonShell = require('python-shell');
 const authUtils = require('../../modules/utils/authUtils')
 const aws = require('aws-sdk');
 const upload = require('../../config/multer')
-var moment = require('moment');
 require('moment-timezone');
 
 // 아티클 등록
@@ -105,7 +104,7 @@ router.get('/:archive_idx/article', async (req, res) => {
     }
 })
 //아카이브 등록
-router.post('/', upload.single('archive_img') ,authUtils.isLoggedin , async (req, res) => {
+router.post('/', upload.single('archive_img'), authUtils.isLoggedin, async (req, res) => {
     const user_idx = req.decoded.idx;
     const archive_title = req.body.title;
     const archive_img = req.file.location;
@@ -125,19 +124,19 @@ router.post('/', upload.single('archive_img') ,authUtils.isLoggedin , async (req
     }
 });
 //아카이브 목록 조회
-router.get('/category/:category_idx',async (req, res) => {
+router.get('/category/:category_idx', async (req, res) => {
     const idx = req.params.category_idx;
     const getArchive = 'SELECT * FROM archive WHERE category_idx = ?';
     const getArchiveResult = await db.queryParam_Arr(getArchive, [idx]);
 
-        if (!getArchiveResult) {
-            res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ADD_ARTICLE_FAIL));
-        } else {
-            res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ARCHIVE_LIST_SUCCESS,getArchiveResult));
-        }
+    if (!getArchiveResult) {
+        res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ADD_ARTICLE_FAIL));
+    } else {
+        res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ARCHIVE_LIST_SUCCESS, getArchiveResult));
+    }
 });
 //아카이브 수정
-router.put('/:archive_idx', authUtils.isLoggedin , async (req, res) => {
+router.put('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
     const archive_idx = req.params.archive_idx;
     const user_idx = req.decoded.idx;
     const archive_title = req.body.title;
@@ -163,11 +162,11 @@ router.delete('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
     const user_idx = req.decoded.idx;
     const deleteArchive = 'DELETE FROM archive WHERE archive_idx = ? AND user_idx = ?';
     const deleteArchiveResult = await db.queryParam_Parse(deleteArchive, [idx, user_idx]);
-    
-    if(deleteArchiveResult.length == 0) {
+
+    if (deleteArchiveResult.length == 0) {
         res.status(200).send(utils.successFalse(statusCode.NO_CONTENT, resMessage.NOT_FIND_ARTICLE));
     } else {
-        if(deleteArchiveResult === undefined) {
+        if (deleteArchiveResult === undefined) {
             res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.DELETE_ARCHIVE_FAIL));
         } else {
             res.status(200).send(utils.successTrue(statusCode.OK, resMessage.DELETE_ARCHIVE_SUCCESS));

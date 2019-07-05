@@ -5,6 +5,11 @@ const resMessage = require('../../modules/utils/responseMessage');
 const statusCode = require('../../modules/utils/statusCode');
 const db = require('../../modules/pool');
 const jwt = require('../../modules/jwt');
+const PythonShell = require('python-shell');
+const authUtils = require('../../modules/utils/authUtils')
+var moment = require('moment');
+require('moment-timezone');
+
 
 // 아티클 읽기
 router.post('/:article_idx/history', async (req, res) => {
@@ -19,30 +24,6 @@ router.post('/:article_idx/history', async (req, res) => {
         res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.READ_ARTICLE_FAIL));
     } else {
         res.status(200).send(utils.successTrue(statusCode.OK, resMessage.READ_ARTICLE_SUCCESS));
-    }
-});
-
-// 아티클 수정 + 링크 -> 썸네일 크롤링 추가해야함
-router.put('/:article_idx', async (req, res) => {
-    const articleIdx = req.params.article_idx;
-    const articleTitle = req.body.article_title;
-    const articleLink = req.body.link;
-    
-    const selectArticleQuery = 'SELECT * FROM article WHERE article_idx = ?';
-    const updateArticleQuery = 'UPDATE article SET article_title = ? , link = ? WHERE article_idx = ?';
-    
-    const selectArticleResult = await db.queryParam_Arr(selectArticleQuery, [articleIdx]);
-
-    if(selectArticleResult.length == 0) {
-        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARTICLE));
-    } else {
-        const updateArticleResult = await db.queryParam_Arr(updateArticleQuery, [articleTitle, articleLink, articleIdx]);
-
-        if(updateArticleResult === undefined) {
-            res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.UPDATE_ARTICLE_FAIL));
-        } else {
-            res.status(200).send(utils.successTrue(statusCode.OK, resMessage.UPDATE_ARTICLE_SUCCESS));
-        }
     }
 });
 
