@@ -48,6 +48,35 @@ router.delete('/:article_idx', async (req, res) => {
     }
 });
 
+// 아티클 좋아요, 좋아요 취소
 
+router.post('/:article_idx/like', async (req, res) => {
+    const articleIdx = req.params.article_idx;
+    
+    // 임의, 토큰처리 필요!!
+    const userIdx = 2; 
+    const getLikeCntQuery = 'SELECT * FROM like WHERE user_idx = ?, article_idx = ?';
+    const insertLikeQuery = 'INSERT INTO like (user_idx, article_idx) VALUES (?, ?)';
+    const deleteLikeQuery = 'DELETE FROM like WHERE user_idx = ?, article_idx = ?';
+
+    const getLikeResult = await db.queryParam_Arr(getLikeCntQuery, [userIdx, articleIdx]);
+
+    if(getLikeResult.length == 0) {
+        const insertLikeResult = await db.queryParam_Arr(insertLikeQuery, [userIdx, articleIdx]);
+        if(insertLikeResult === undefined) {
+            res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.LIKE_ARTICLE_FAIL));
+        } else {
+            res.status(200).send(utils.successTrue(statusCode.OK, resMessage.LIKE_ARTICLE_SUCCESS));
+        }
+    } else {
+        const deleteLikeResult = await db.queryParam_Arr(deleteLikeQuery, [userIdx, articleIdx]);
+        if(deleteLikeResult === undefined) {
+            res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.UNLIKE_ARTICLE_FAIL));
+        } else {
+            res.status(200).send(utils.successTrue(statusCode.OK, resMessage.UNLIKE_ARTICLE_SUCCESS));
+        }
+
+    }
+});
 
 module.exports = router;
