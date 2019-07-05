@@ -32,7 +32,9 @@ module.exports =  {
     DELETE_ARTICLE_SUCCESS: "아티클 삭제 성공",
     DELETE_ARTICLE_FAIL: "아티클 삭제 실패",
     READ_ARTICLE_SUCCESS: "아티클 읽기 성공",
-    READ_ARTICLE_FAIL: "아티클 읽기 실패"
-
-    
+    READ_ARTICLE_FAIL: "아티클 읽기 실패",
+    LIKE_ARTICLE_SUCCESS: "아티클 좋아요 성공",
+    LIKE_ARTICLE_FAIL: "아티클 좋아요 실패",
+    UNLIKE_ARTICLE_SUCCESS: "아티클 좋아요 취소 성공",
+    UNLIKE_ARTICLE_FAIL: "아티클 좋아요 취소 실패"
 }
