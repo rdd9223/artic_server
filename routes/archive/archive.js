@@ -20,23 +20,27 @@ router.post('/', upload.single('archive_img'), authUtils.isLoggedin, async (req,
     const category_idx = req.body.category_idx;
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
-
-    if (!archive_title || !archive_img || !category_idx) {
-        res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.REGISTER_ARCHIVE_UNOPENED));
+    if (user_idx != 12) {
+        res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
     } else {
-        const archiveRegister = await db.Transaction(async (connection) => {
-            const InsertArchive = 'INSERT INTO archive (user_idx, archive_title, date, archive_img, category_idx) VALUES (?, ?, ?, ?, ?)';
-            const InsertArchiveResult = await connection.query(InsertArchive, [user_idx, archive_title, date, archive_img, category_idx]);
-            const archiveIdx = InsertArchiveResult.insertId
-            const InsertAchiveCategory = 'INSERT INTO archiveCategory (archive_idx, category_idx) VALUES (?, ?)';
-            const InsertArchiveCategoryResult = await connection.query(InsertAchiveCategory, [archiveIdx, category_idx])
-        });
-        if (!archiveRegister) {
-            res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.REGISTER_ARCHIVE_FAIL));
+        if (!archive_title || !archive_img || !category_idx) {
+            res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.REGISTER_ARCHIVE_UNOPENED));
         } else {
-            res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.REGISTER_ARCHIVE_SUCCESS));
+            const archiveRegister = await db.Transaction(async (connection) => {
+                const InsertArchive = 'INSERT INTO archive (user_idx, archive_title, date, archive_img, category_idx) VALUES (?, ?, ?, ?, ?)';
+                const InsertArchiveResult = await connection.query(InsertArchive, [user_idx, archive_title, date, archive_img, category_idx]);
+                const archiveIdx = InsertArchiveResult.insertId
+                const InsertAchiveCategory = 'INSERT INTO archiveCategory (archive_idx, category_idx) VALUES (?, ?)';
+                const InsertArchiveCategoryResult = await connection.query(InsertAchiveCategory, [archiveIdx, category_idx])
+            });
+            if (!archiveRegister) {
+                res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.REGISTER_ARCHIVE_FAIL));
+            } else {
+                res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.REGISTER_ARCHIVE_SUCCESS));
+            }
         }
     }
+
 });
 
 //아카이브 수정
@@ -83,52 +87,59 @@ router.delete('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 });
 
 // 아티클 등록
-router.post('/:archive_idx/article', async (req, res) => {
+router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
+    const user_idx = req.decoded.idx;
     const archiveIdx = req.params.archive_idx
     const url = req.body.url
-    //크롤링
-    var options = {
-        mode: 'text',
-        pythonPath: '',
-        //서버 올린 후 경로 수정 -> /usr/bin/python3
-        pythonOptions: ['-u'],
-        scriptPath: __dirname,
-        args: [url]
-    };
-    const selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ?';
-    const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx)  VALUES (?, ?)';
-    const archiveResult = await db.queryParam_Arr(selectArchiveQuery, [archiveIdx]);
 
-    if (archiveResult.length == 0) {
-        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
+    if (user_idx != 12) {
+        res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.ARTICLE_NO_ADD_AUTH))
     } else {
-        function python() {
-            return new Promise((resolve, reject) => {
-                PythonShell.PythonShell.run('dbconfig.py', options, function (err, results) {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        console.log('results: %j', results);
-                        resolve(results);
-                    }
-                });
-            })
-        }
-        await python();
-        const insertTransaction = await db.Transaction(async (connection) => {
-            const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
-            const selectArticleIdxResult = await db.queryParam_None(selectArticleIdx);
-            const articleIdx = selectArticleIdxResult[0].article_idx
-            console.log(selectArticleIdxResult[0].article_idx);
-            const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
-        });
-        if (insertTransaction === undefined) {
-            res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));
-        } else {
-            res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS));
-        }
+        //크롤링
+        var options = {
+            mode: 'text',
+            pythonPath: '',
+            //서버 올린 후 경로 수정 -> /usr/bin/python3
+            pythonOptions: ['-u'],
+            scriptPath: __dirname,
+            args: [url]
+        };
+        const selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ?';
+        const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx)  VALUES (?, ?)';
+        const archiveResult = await db.queryParam_Arr(selectArchiveQuery, [archiveIdx]);
 
+        if (archiveResult.length == 0) {
+            res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
+        } else {
+            function python() {
+                return new Promise((resolve, reject) => {
+                    PythonShell.PythonShell.run('dbconfig.py', options, function (err, results) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            console.log('results: %j', results);
+                            resolve(results);
+                        }
+                    });
+                })
+            }
+            await python();
+            const insertTransaction = await db.Transaction(async (connection) => {
+                const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
+                const selectArticleIdxResult = await db.queryParam_None(selectArticleIdx);
+                const articleIdx = selectArticleIdxResult[0].article_idx
+                console.log(selectArticleIdxResult[0].article_idx);
+                const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
+            });
+            if (insertTransaction === undefined) {
+                res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));
+            } else {
+                res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS));
+            }
+
+        }
     }
+
 });
 
 // 아티클 목록 (신규 순)
@@ -139,14 +150,14 @@ router.get('/:archive_idx/articles', authUtils.isLoggedin, async (req, res) => {
     const getLikeCntQuery = 'SELECT COUNT(article_idx) cnt FROM artic.like WHERE article_idx = ?';
     const getLikeCheckQuery = 'SELECT * FROM artic.like WHERE user_idx = ? AND article_idx = ?';
     const selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ?';
-    
+
     const archiveResult = await db.queryParam_Arr(selectArchiveQuery, [archiveIdx]);
 
     if (archiveResult.length == 0) {
         res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
     } else {
         const articleListResult = await db.queryParam_Arr(getArticlesQuery, [archiveIdx]);
-        
+
         if (articleListResult === undefined) {
             res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.LIST_ARTICLE_FAIL));
         } else {
@@ -158,7 +169,7 @@ router.get('/:archive_idx/articles', authUtils.isLoggedin, async (req, res) => {
                 if (likeCntResult === undefined || likeCheckResult === undefined) {
                     res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_LIKE_INFO));
                 } else {
-                    if(likeCheckResult.length == 0) {
+                    if (likeCheckResult.length == 0) {
                         article.like = false;
                     } else {
                         article.like = true;
@@ -182,13 +193,13 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
 
     const selectArchiveResult = await db.queryParam_Arr(selectArchiveQuery, [archiveIdx, userIdx]);
 
-    if(selectArchiveResult === undefined) {
+    if (selectArchiveResult === undefined) {
         res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
-    } else if(selectArchiveResult == 0) {
+    } else if (selectArchiveResult == 0) {
         res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_ARCHIVE_OWNER));
     } else {
         const insertArticleResult = await db.queryParam_Arr(insertArticleQuery, [articleIdx, archiveIdx]);
-        if(insertArticleResult === undefined) {
+        if (insertArticleResult === undefined) {
             res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.SCRAP_ARTICLE_FAIL));
         } else {
             res.status(200).send(utils.successTrue(statusCode.OK, resMessage.SCRAP_ARTICLE_SUCCESS));
