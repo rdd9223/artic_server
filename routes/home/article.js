@@ -4,6 +4,7 @@ const defaultRes = require('../../modules/utils/utils');
 const statusCode = require('../../modules/utils/statusCode');
 const resMessage = require('../../modules/utils/responseMessage');
 const db = require('../../modules/pool');
+const authUtils = require('../../modules/utils/authUtils');
 const upload = require('../../config/multer');
 
 // 신규 아티클 더보기
@@ -22,30 +23,40 @@ router.get('/new', async(req,res)=>{
 router.get('/new/:article_idx', async(req,res)=>{
     const idx  = req.params.article_idx;
 
-    const getOneNewArticleQuery = 'SELECT at.*, ac.archive_title FROM archiveArticle aa, article at, archive ac WHERE aa.article_idx = ? AND aa.archive_idx = ac.archive_idx ';
-    const getOneNewArticleResult = await db.queryParam_Parse(getOneNewArticleQuery, [idx]);
-
+	const getOneNewArticleQuery = 'SELECT * FROM article WHERE article_idx = ?'
+	const getOneNewArticleResult = await db.queryParam_Parse(getOneNewArticleQuery, [idx]);
+	const getOneNewArchive = 'SELECT archive_idx FROM archiveArticle WHERE article_idx = ? ORDER BY archiveArticle_idx LIMIT 1' //그 아티클이 속해있는 아카이브 제일 처음꺼
+	const getOneNewArchiveTitle = 'SELECT archive_title FROM archive WHERE archive_idx = ?'
 	if(!getOneNewArticleResult){
         res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_NEW_FAIL));
 	} else {
+		for(var i = 0 , article; article = getOneNewArticleResult[i]; i++) { 
+			const articleIdx = article.archive_idx;
+			const archiveTitleIdx = await db.queryParam_Arr(getOneNewArchive,[getOneNewArticleResult[0].article_idx]);
+			const archiveTitle = await db.queryParam_Arr(getOneNewArchiveTitle,[archiveTitleIdx[0].archive_idx])
+			article.archive_title = archiveTitle[0].archive_title;
+		}
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_NEW_SUCCESS, getOneNewArticleResult));
     }
-    //해당 아카이브에 있는 아티클
 
 });
 //최근 읽은 아티클
-router.get('/history', async(req,res)=>{
-	 const getAllCategoryQuery = 'SELECT * FROM read ORDER BY date DESC';
-	// const getAllcategoryResult = await db.queryParam_None(getAllCategoryQuery);
+router.get('/history', authUtils.isLoggedin, async(req,res)=>{
+	const user_idx = req.decoded.idx;
+	 const getHistory = 'SELECT * FROM artic.read WHERE user_idx = ? ORDER BY date DESC';
+	 const getHistoryResult = await db.queryParam_Arr(getHistory,[user_idx]);
 
-	// if(!getAllcategoryResult){
-	// 	res.status(200).send(defaultRes.successFalse(statusCode.CATEGORY_SELECT_FAIL));
-	// } else {
-	// 	res.status(200).send(defaultRes.successTrue(statusCode.CATEGORY_SELECT_SUCCESS, getAllcategoryResult));
-    // }
-   //   /archive/article/:article_idx/history
-
-
+	if(!getHistoryResult){
+		res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_HISTORY_FAIL));
+	} else {
+		if(getHistoryResult.length == 0) {
+			res.status(200).send(defaultRes.successFalse(statusCode.NO_CONTENT, resMessage.HOME_HISTORY_NO));
+		} else {
+			console.log(getHistoryResult.length);
+			res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_HISTORY_SUCESS, getHistoryResult));
+		}
+		
+    }
 });
 
 //아틱의 선택 
