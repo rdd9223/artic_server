@@ -20,7 +20,7 @@ router.get('/new', async(req,res)=>{
 
 });
 // 신규 아티클 하나
-router.get('/new/:article_idx', async(req,res)=>{
+router.get('/:article_idx/new', async(req,res)=>{
     const idx  = req.params.article_idx;
 
 	const getOneNewArticleQuery = 'SELECT * FROM article WHERE article_idx = ?'

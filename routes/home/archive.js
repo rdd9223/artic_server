@@ -12,7 +12,10 @@ router.get('/new', async (req, res) => {
 	const getNewArchiveQuery = 'SELECT ca.category_title, ar.*  FROM archive ar INNER JOIN category ca where ar.category_idx = ca.category_idx ORDER BY date DESC';
 	const getNewArchiveResult = await db.queryParam_None(getNewArchiveQuery);
 	const getNewArticleCount = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ? '; //해당 아카이브에 들어있는 아티클개수
-
+	// ++
+	const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx'
+	
+	
 	if (!getNewArchiveResult) {
 		res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_NEW_FAIL));
 	} else {
@@ -20,6 +23,10 @@ router.get('/new', async (req, res) => {
 			const archiveIdx = archive.archive_idx;
 			const archiveCount = await db.queryParam_Arr(getNewArticleCount,[archiveIdx])
 			archive.article_cnt = archiveCount[0].count
+
+			// ++
+			const archiveCategoryResult = await db.queryParam_Arr(getArchiveCategoryQuery, [archiveIdx])
+			archive.category_all = archiveCategoryResult
 		}
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_NEW_SUCCESS, getNewArchiveResult));
 	}
