@@ -20,12 +20,18 @@ router.post('/', upload.single('archive_img'), authUtils.isLoggedin, async (req,
     const category_idx = req.body.category_idx;
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
-    const InsertArchive = 'INSERT INTO archive (user_idx, archive_title, date, archive_img, category_idx) VALUES (?, ?, ?, ?, ?)';
-    const InsertArchiveResult = await db.queryParam_Parse(InsertArchive, [user_idx, archive_title, date, archive_img, category_idx]);
+
     if (!archive_title || !archive_img || !category_idx) {
         res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.REGISTER_ARCHIVE_UNOPENED));
     } else {
-        if (!InsertArchiveResult) {
+        const archiveRegister = await db.Transaction(async (connection) => {
+            const InsertArchive = 'INSERT INTO archive (user_idx, archive_title, date, archive_img, category_idx) VALUES (?, ?, ?, ?, ?)';
+            const InsertArchiveResult = await connection.query(InsertArchive, [user_idx, archive_title, date, archive_img, category_idx]);
+            const archiveIdx = InsertArchiveResult.insertId
+            const InsertAchiveCategory = 'INSERT INTO archiveCategory (archive_idx, category_idx) VALUES (?, ?)';
+            const InsertArchiveCategoryResult = await connection.query(InsertAchiveCategory, [archiveIdx, category_idx])
+        });
+        if (!archiveRegister) {
             res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.REGISTER_ARCHIVE_FAIL));
         } else {
             res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.REGISTER_ARCHIVE_SUCCESS));
@@ -33,10 +39,10 @@ router.post('/', upload.single('archive_img'), authUtils.isLoggedin, async (req,
     }
 });
 //아카이브 목록 조회
-router.get('/category/:category_idx', async (req, res) => {
+router.get('/category/:category_idx',async (req, res) => {
     const idx = req.params.category_idx;
-    const getArchive = 'SELECT * FROM archive WHERE category_idx = ?';
-    const getArchiveResult = await db.queryParam_Arr(getArchive, [idx]);
+    const getArchive = 'SELECT * FROM archive WHERE category_idx = ? WHERE user_idx = 12';
+    const getArchiveResult = await db.queryParam_Arr(getArchive, [idx, user_idx]);
 
     if (!getArchiveResult) {
         res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ADD_ARTICLE_FAIL));
