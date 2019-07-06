@@ -31,7 +31,7 @@ module.exports =  {
 	SAVE_SUCCESS: "저장 성공",
     SAVE_FAIL: "저장 실패",
     
-    NOT_FIND_LIKE_CNT: "아티클 좋아요 갯수 실패",
+    NOT_FIND_LIKE_INFO: "아티클 좋아요 정보 조회 실패",
     NOT_FIND_ARCHIVE: "해당 아카이브 없음",
     ADD_ARTICLE_SUCCESS: "아티클 등록 성공",
     ADD_ARTICLE_FAIL: "아티클 등록 실패",
@@ -50,6 +50,13 @@ module.exports =  {
     DELETE_ARTICLE_FAIL: "아티클 삭제 실패",
     READ_ARTICLE_SUCCESS: "아티클 읽기 성공",
     READ_ARTICLE_FAIL: "아티클 읽기 실패",
+    SCRAP_ARTICLE_SUCCESS: "아티클 담기 성공",
+    SCRAP_ARTICLE_FAIL: "아티클 담기 실패",
+    NOT_ARCHIVE_OWNER: "아카이브 소유자가 아님",
+    LIKE_ARTICLE_FAIL: "아티클 좋아요 실패",
+    LIKE_ARTICLE_SUCCESS: "아티클 좋아요 성공",
+    UNLIKE_ARTICLE_FAIL: "아티클 좋아요 취소 실패",
+    UNLIKE_ARTICLE_SUCCESS: "아티클 좋아요 취소 성공",
 
     REGISTER_ARCHIVE_SUCCESS : "아카이브 등록 성공",
     REGISTER_ARCHIVE_FAIL : "아카이브 등록 실패",
