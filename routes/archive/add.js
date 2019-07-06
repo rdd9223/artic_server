@@ -21,7 +21,7 @@ router.post('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 		if (!insertAddArchiveResult) {
 			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.INSERT_ADD_ARCHIVE_FAIL));
 		} else {
-			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.INSERT_ADD_ARCHIVE_SUCCESS));
+			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.INSERT_ADD_ARCHIVE_SUCCESS, insertAddArchiveResult));
 		}
 	} else {
 		const deleteAddArchiveResult = await db.queryParam_Arr(deleteAddArchiveQuery, [userIdx, archiveIdx]);
