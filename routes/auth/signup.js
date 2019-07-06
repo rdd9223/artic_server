@@ -6,7 +6,6 @@ const resMessage = require('../../modules/utils/responseMessage');
 const statusCode = require('../../modules/utils/statusCode');
 const db = require('../../modules/pool');
 const encrytion = require('../../modules/encrytion/encrytionModule');
-
 const crypto = require('crypto-promise');
 
 //회원가입
@@ -20,7 +19,7 @@ router.post('/', async(req, res) => {
     const insertQuery = 'INSERT INTO user (user_id, user_pw, user_type, user_birth, user_name, salt) VALUES (?, ?, ?, ?, ?, ?)';
 
     if (!id || !pw || !name || !birth) { //널값으로 들어오면 안돼
-        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
+        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.SIGNUP_NULL_VALUE));
     } else { //id중복값 체크
         const selectResult = await db.queryParam_Arr(selectQuery, [id]);
         if (!selectResult) {

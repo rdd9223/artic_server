@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
 	const selectQuery = 'SELECT * FROM user WHERE user_id = ?';
 
 	if (!id || !pw) { //아이디가 없고 패스워드도 없음
-		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ID_OR_PW_NULL_VALUE));
 	} else {
 		const selectResult = await db.queryParam_Parse(selectQuery, [id])
 
