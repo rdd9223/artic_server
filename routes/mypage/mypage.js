@@ -25,13 +25,13 @@ router.get('/', authUtil.isLoggedin, async (req, res) => {
 	}
 });
 
+// 마이페이지 수정
 router.put('/', authUtil.isLoggedin, async (req, res) => {
 	const img = req.body.img;
-	const id = req.body.id;
 	const intro = req.body.intro;
 	const name = req.body.name;
 
-	if (!img || !id || !intro || !name) {
+	if (!img || !intro || !name) {
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
 	} else {
 		const updateUserInfoQuery = "UPDATE user SET user_img = ?, user_intro = ?, user_name = ? WHERE user_idx = ?";
@@ -45,28 +45,30 @@ router.put('/', authUtil.isLoggedin, async (req, res) => {
 	}
 });
 
+// 내가 스크랩한 아카이브 조회
 router.get('/archive/scrap', authUtil.isLoggedin, async (req, res) => {
 	// 토큰을 받아 사용자 인증을 한다
 	console.log(req.decoded.idx);
 
 	// archiveAdd 테이블에 user_idx에 해당하는 아카이브를 모두 조회한다, 해당하는 아카이브를 모두 가져온다
 	const findScrapArchiveQuery = 'SELECT * FROM archive, archiveAdd WHERE archiveAdd.user_idx = ? AND archiveAdd.archive_idx = archive.archive_idx';
-	const findScrapArchiveResult = await db.queryParam_Arr(findScrapArchiveQuery,[req.decoded.idx]);
+	const findScrapArchiveResult = await db.queryParam_Arr(findScrapArchiveQuery, [req.decoded.idx]);
 
-	if(!findScrapArchiveResult){
-		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_MY_ARCHIVE));
+	if (!findScrapArchiveResult) {
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.FIND_ADD_ARCHIVE_FAIL));
 	} else {
-		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_MY_ARCHIVE_SUCCESS,findScrapArchiveResult));
+		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_ADD_ARCHIVE_SUCCESS, findScrapArchiveResult));
 	}
 });
 
+// 내가 만든 아카이브 조회
 router.get('/archive/mine', authUtil.isLoggedin, async (req, res) => {
-	
+
 	const findMyArchiveQuery = 'SELECT * FROM archive WHERE user_idx = ?';
 	const findMyArchiveResult = await db.queryParam_Arr(findMyArchiveQuery, [req.decoded.idx]);
 
-	if(!findMyArchiveResult){
-		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
+	if (!findMyArchiveResult) {
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.FIND_MY_ARCHIVE_FAIL));
 	} else {
 		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_MY_ARCHIVE_SUCCESS, findMyArchiveResult));
 	}

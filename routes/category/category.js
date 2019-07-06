@@ -11,7 +11,7 @@ router.get('/', async(req,res)=>{
 	const getAllCategoryResult = await db.queryParam_None(getAllCategoryQuery);
 
 	if(!getAllCategoryResult){
-		res.status(200).send(utils.successFalse(statusCode.OK, resMessage.CATEGORY_SELECT_FAIL));
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.CATEGORY_SELECT_FAIL));
 	} else {
 		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.CATEGORY_SELECT_SUCCESS, getAllCategoryResult));
 	}
