@@ -20,23 +20,27 @@ router.post('/', upload.single('archive_img'), authUtils.isLoggedin, async (req,
     const category_idx = req.body.category_idx;
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
-
-    if (!archive_title || !archive_img || !category_idx) {
-        res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.REGISTER_ARCHIVE_UNOPENED));
+    if (user_idx != 12) {
+        res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
     } else {
-        const archiveRegister = await db.Transaction(async (connection) => {
-            const InsertArchive = 'INSERT INTO archive (user_idx, archive_title, date, archive_img, category_idx) VALUES (?, ?, ?, ?, ?)';
-            const InsertArchiveResult = await connection.query(InsertArchive, [user_idx, archive_title, date, archive_img, category_idx]);
-            const archiveIdx = InsertArchiveResult.insertId
-            const InsertAchiveCategory = 'INSERT INTO archiveCategory (archive_idx, category_idx) VALUES (?, ?)';
-            const InsertArchiveCategoryResult = await connection.query(InsertAchiveCategory, [archiveIdx, category_idx])
-        });
-        if (!archiveRegister) {
-            res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.REGISTER_ARCHIVE_FAIL));
+        if (!archive_title || !archive_img || !category_idx) {
+            res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.REGISTER_ARCHIVE_UNOPENED));
         } else {
-            res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.REGISTER_ARCHIVE_SUCCESS));
+            const archiveRegister = await db.Transaction(async (connection) => {
+                const InsertArchive = 'INSERT INTO archive (user_idx, archive_title, date, archive_img, category_idx) VALUES (?, ?, ?, ?, ?)';
+                const InsertArchiveResult = await connection.query(InsertArchive, [user_idx, archive_title, date, archive_img, category_idx]);
+                const archiveIdx = InsertArchiveResult.insertId
+                const InsertAchiveCategory = 'INSERT INTO archiveCategory (archive_idx, category_idx) VALUES (?, ?)';
+                const InsertArchiveCategoryResult = await connection.query(InsertAchiveCategory, [archiveIdx, category_idx])
+            });
+            if (!archiveRegister) {
+                res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.REGISTER_ARCHIVE_FAIL));
+            } else {
+                res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.REGISTER_ARCHIVE_SUCCESS));
+            }
         }
     }
+
 });
 
 //아카이브 수정
