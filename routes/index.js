@@ -8,7 +8,6 @@ router.use('/mypage', require('./mypage/index'));
 router.use('/archive', require('./archive/index'));
 router.use('/notification', require('./notification/index'));
 router.use('/category', require('./category/index'));
-router.use('/article', require('./article/index'));
 
 
 
