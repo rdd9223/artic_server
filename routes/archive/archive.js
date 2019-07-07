@@ -134,8 +134,13 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 				// 영우 알림
 				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = archiveIdx';
 				const getAddArchiveUserResult = await db.queryParam_None(getAddArchiveUserQuery);
-				const notificationType = ""
-				
+
+				const notificationBody = {
+					user_idx: getAddArchiveUserResult,
+					article_idx: articleIdx,
+					notification_type: 0
+				}
+				Notification.create(notificationBody)
             });
             if (insertTransaction === undefined) {
                 res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));

@@ -1,16 +1,21 @@
 var express = require('express');
 var router = express.Router();
-
+const db = require('../../modules/pool');
 const resMessage = require('../../modules/utils/responseMessage');
 const statusCode = require('../../modules/utils/statusCode');
 const utils = require('../../modules/utils/utils');
 const authUtils = require('../../modules/utils/authUtils');
 const Notification = require('../../modules/mongo/notificationSchema'); //코드에 쓸 스키마 가져오기
-//mongoose promise지원
+// mongoose promise지원
 
+// notification type code
+// newArticle = 0
+// recommend = 1
+// notRead = 2
 router.get('/', authUtils.isLoggedin, async (req, res) => {
 	const userIdx = req.decoded.idx
-    //오름차순 = 1, 내림차순 = -1
+	//오름차순 = 1, 내림차순 = -1
+	console.log(req.body);
     Notification.find(userIdx).sort({ date: -1 })
         .then((allNotifications) => {
             res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.READ_FAIL, allNotifications));
@@ -38,7 +43,7 @@ router.post('/', async(req, res) => {
 		user_idx[i] = getUserReselt[i];
 	}
 
-	const insertTypeQuery = 'INSERT INTO '
+	//const insertTypeQuery = 'INSERT INTO '
 	notification.create(req.body)
 	.then((result) => {
 		res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, result));
