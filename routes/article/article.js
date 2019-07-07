@@ -6,7 +6,6 @@ const statusCode = require('../../modules/utils/statusCode');
 const db = require('../../modules/pool');
 const PythonShell = require('python-shell');
 const authUtils = require('../../modules/utils/authUtils')
-var moment = require('moment');
 require('moment-timezone');
 
 
@@ -86,7 +85,5 @@ router.post('/:article_idx/like', authUtils.isLoggedin, async (req, res) => {
         }
     }
 });
-
-
 
 module.exports = router;

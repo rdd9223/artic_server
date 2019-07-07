@@ -87,5 +87,14 @@ module.exports =  {
 	INSERT_ADD_ARCHIVE_FAIL: "아카이브 담기 실패",
 	INSERT_ADD_ARCHIVE_SUCCESS: "아카이브 담기 성공",
 	FIND_ADD_ARCHIVE_SUCCESS: "담은 아카이브 조회 성공",
-	FIND_ADD_ARCHIVE_FAIL: "담은 아카이브 조회 실패",
+    FIND_ADD_ARCHIVE_FAIL: "담은 아카이브 조회 실패",
+    
+    SEARCH_ARTICLE_FAIL: "아티클 검색 실패",
+    SEARCH_ARTICLE_SUCCESS: "아티클 검색 성공",
+    SEARCH_ARCHIVE_FAIL: "아카이브 검색 실패",
+    SEARCH_ARCHIVE_SUCCESS: "아카이브 검색 성공",
+    ARCHIVE_ARTICLE_COUNT_FAIL: "아티클 갯수 조회 실패",
+    ARCHIVE_CATEGORY_FAIL: "아카이브 카테고리 조회 실패",
+    ARCHIVE_SCRAP_CHECK_FAIL: "아카이브 스크랩 유무 조회 실패",
+
 }
