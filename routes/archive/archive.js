@@ -11,6 +11,7 @@ const Notification = require('../../modules/mongo/notificationSchema');
 const aws = require('aws-sdk');
 const upload = require('../../config/multer')
 var moment = require('moment');
+const crawlingoption = require('../../modules/crawling/crawlingoption')
 require('moment-timezone');
 
 //아카이브 등록
@@ -104,14 +105,14 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
         res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.ARTICLE_NO_ADD_AUTH))
     } else {
         //크롤링
-        var options = {
-            mode: 'text',
-            pythonPath: '',
-            //서버 올린 후 경로 수정 -> /usr/bin/python3
-            pythonOptions: ['-u'],
-            scriptPath: __dirname,
-            args: [url]
-        };
+        // var options = {
+        //     mode: 'text',
+        //     pythonPath: '',
+        //     //서버 올린 후 경로 수정 -> /usr/bin/python3
+        //     pythonOptions: ['-u'],
+        //     scriptPath: __dirname,
+        //     args: [url]
+        // };
         const selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ?'; //아카이브 idx가져오기
         const selectArchiveResult = await db.queryParam_Arr(selectArchiveQuery,[archiveIdx]);
 
@@ -120,7 +121,7 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
         } else {
             function python() {
                 return new Promise((resolve, reject) => {
-                    PythonShell.PythonShell.run('dbconfig.py', options, function (err, results) {
+                    PythonShell.PythonShell.run('dbconfig.py', crawlingoption(url), function (err, results) {
                         if (err) {
                             reject(err);
                         } else {
@@ -130,7 +131,7 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
                     });
                 })
             }
-            await python();
+            await python(url);
             const insertTransaction = await db.Transaction(async (connection) => {
                 const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
                 const selectArticleIdxResult = await connection.query(selectArticleIdx);
