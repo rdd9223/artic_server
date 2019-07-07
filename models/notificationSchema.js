@@ -6,7 +6,7 @@ moment.tz.setDefault("Asia/Seoul");
 
 const notificationSchema = new mongoose.Schema({
     user_idx: { type: Array, required: true},
-    article_idx: { type: String, required: true},
+    article_idx: { type: Number, required: true},
     notification_type: { type: String, required: true}
 }, {
     versionKey: false
