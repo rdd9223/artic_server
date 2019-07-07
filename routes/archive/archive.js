@@ -126,7 +126,7 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
             await python();
             const insertTransaction = await db.Transaction(async (connection) => {
                 const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
-                const selectArticleIdxResult = await db.queryParam_None(selectArticleIdx);
+                const selectArticleIdxResult = await connection.query(selectArticleIdx);
                 const articleIdx = selectArticleIdxResult[0].article_idx
                 console.log(selectArticleIdxResult[0].article_idx);
                 const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
