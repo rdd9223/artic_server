@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const secretOrPrivateKey = "jwtSecretKey!";
 const options = {
     algorithm: "HS256",
-    expiresIn: "24h",
+    expiresIn: "7 days",
     issuer: "artic"
 };
 // const refreshOptions = {
