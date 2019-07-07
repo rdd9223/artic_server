@@ -10,5 +10,6 @@ router.use('/notification', require('./notification/index'));
 router.use('/category', require('./category/index'));
 router.use('/practice', require('./practice'));
 
+router.use('/search', require('./search/index'));
 
 module.exports = router;
