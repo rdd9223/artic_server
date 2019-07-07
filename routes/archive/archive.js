@@ -6,7 +6,8 @@ const statusCode = require('../../modules/utils/statusCode');
 const db = require('../../modules/pool');
 const jwt = require('../../modules/jwt');
 const PythonShell = require('python-shell');
-const authUtils = require('../../modules/utils/authUtils')
+const authUtils = require('../../modules/utils/authUtils');
+const Notification = require('../../modules/mongo/notificationSchema');
 const aws = require('aws-sdk');
 const upload = require('../../config/multer')
 var moment = require('moment');
@@ -128,8 +129,18 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
                 const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
                 const selectArticleIdxResult = await db.queryParam_None(selectArticleIdx);
                 const articleIdx = selectArticleIdxResult[0].article_idx
-                console.log(selectArticleIdxResult[0].article_idx);
+				console.log(selectArticleIdxResult[0].article_idx);
                 const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
+				// 영우 알림
+				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = archiveIdx';
+				const getAddArchiveUserResult = await db.queryParam_None(getAddArchiveUserQuery);
+
+				const notificationBody = {
+					user_idx: getAddArchiveUserResult,
+					article_idx: articleIdx,
+					notification_type: 0
+				}
+				Notification.create(notificationBody)
             });
             if (insertTransaction === undefined) {
                 res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));

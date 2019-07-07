@@ -29,7 +29,7 @@ router.get('/:category_idx/archives', async (req, res) => {
     if (!getNewArchiveResult) {
         res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ARCHIVE_LIST_FAIL));
     } else {
-        if (getArchiveResult.length == 0) {
+        if (getNewArchiveResult.length == 0) {
             res.status(200).send(utils.successFalse(statusCode.NO_CONTENT, resMessage.ARCHIVE_NO));
         } else {
             for (var i = 0, archive; archive = getNewArchiveResult[i]; i++) {
