@@ -20,9 +20,8 @@ router.get('/articles/new',authUtils.isLoggedin, async (req, res) => {
 
 });
 // 신규 아티클 하나 
-router.get('/new/:article_idx', authUtils.isLoggedin, async (req, res) => {
+router.get('/new/:article_idx', async (req, res) => {
 	const idx = req.params.article_idx;
-	//const user_idx = req.decoded.idx;
 	const getOneNewArticleQuery = 'SELECT * FROM artic.article WHERE article_idx = ?'
 	const getOneNewArticleResult = await db.queryParam_Parse(getOneNewArticleQuery, [idx]);
 	console.log(`이건되는디${getOneNewArticleResult[0].article_idx}`)
