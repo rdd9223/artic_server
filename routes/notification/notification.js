@@ -4,35 +4,28 @@ var router = express.Router();
 const resMessage = require('../../modules/utils/responseMessage');
 const statusCode = require('../../modules/utils/statusCode');
 const utils = require('../../modules/utils/utils');
-
-const notification = require('../../modules/mongo/notificationSchema'); //코드에 쓸 스키마 가져오기
+const authUtils = require('../../modules/utils/authUtils');
+const Notification = require('../../modules/mongo/notificationSchema'); //코드에 쓸 스키마 가져오기
 //mongoose promise지원
 
-router.get('/', async (req, res) => {
+router.get('/', authUtils.isLoggedin, async (req, res) => {
+	const userIdx = req.decoded.idx
     //오름차순 = 1, 내림차순 = -1
-    notification.find().sort({ date: -1 })
-        .then((allnotifications) => {
-            res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.READ_FAIL, allnotifications));
+    Notification.find(userIdx).sort({ date: -1 })
+        .then((allNotifications) => {
+            res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.READ_FAIL, allNotifications));
         }).catch((err) => {
             res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
     });
-})
-
-router.get('/:user', async (req,res)=>{
-	notification.find({
-		category: req.params.category
-	})
-	.then((notifications) => console.log(notifications))
-	.catch((err) => console.log(err));
 })
 
 router.post('/', async(req, res) => {
 	//아티클저장 - 인서트 id가 아티클 id
 	//아카이브 인덱스를 좋아요하는 유저들 idx뽑아와
 	//index가지고 있는걸 배열로 저장
-	//알림 타입 지정
+	//알림 타입 지정 insert type
 	//제이슨으로 저장(몽고디비)
-	const getArticleQuery = 'SELECT article_idx FROM article';
+	const getArticleQuery = 'SELECT article FROM article';
 	const getArticleResult = await db.queryParam_None(getArticleQuery);
 
 	const article_idx = getArticleResult;
@@ -55,3 +48,6 @@ router.post('/', async(req, res) => {
 });
 
 module.exports = router;
+// 담기한 아카이브에서 새로운 글 등록시 알림
+// 추천
+// 아카이브 담은것중에 안읽은거  읽었느지

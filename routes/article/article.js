@@ -46,7 +46,8 @@ router.post('/:archive_idx', async (req, res) => {
         const insertTransaction = await db.Transaction(async (connection) => {
             const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
             const selectArticleIdxResult = await db.queryParam_None(selectArticleIdx);
-            const articleIdx = selectArticleIdxResult[0].article_idx
+			const articleIdx = selectArticleIdxResult[0].article_idx
+			//알림
             console.log(selectArticleIdxResult[0].article_idx);
             const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
         });
