@@ -9,7 +9,6 @@ const authUtils = require('../../modules/utils/authUtils')
 require('moment-timezone');
 
 
-
 // 아티클 읽기
 router.post('/:article_idx/history', authUtils.isLoggedin, async (req, res) => {
     const articleIdx = req.params.article_idx;

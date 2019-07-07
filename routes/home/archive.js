@@ -8,8 +8,8 @@ const authUtils = require('../../modules/utils/authUtils');
 const upload = require('../../config/multer');
 
 // 신규 아카이브 더보기 (최신순 정렬)
-router.get('/new', async (req, res) => {
-	const getNewArchiveQuery = 'SELECT ca.category_title, ar.*  FROM archive ar INNER JOIN category ca where ar.category_idx = ca.category_idx ORDER BY date DESC';
+router.get('/archives/new', async (req, res) => {
+	const getNewArchiveQuery = 'SELECT ar.*  FROM archive ar INNER JOIN category ca where ar.category_idx = ca.category_idx ORDER BY date DESC';
 	const getNewArchiveResult = await db.queryParam_None(getNewArchiveQuery);
 	const getNewArticleCount = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ? '; //해당 아카이브에 들어있는 아티클개수
 	// ++
@@ -32,7 +32,7 @@ router.get('/new', async (req, res) => {
 	}
 });
 // 신규 아카이브 하나보기
-router.get('/new/:archive_idx', async (req, res) => {
+router.get('/:archive_idx', async (req, res) => {
 	const idx = req.params.archive_idx;
 	const getOneNewArchiveQuery = 'SELECT ac.archive_title, ar.article_idx, at.* FROM archive ac, archiveArticle ar, article at WHERE ac.archive_idx = ? AND ar.article_idx = at.article_idx' ;
 	const getOneNewArchiveResult = await db.queryParam_Arr(getOneNewArchiveQuery,[idx]);
