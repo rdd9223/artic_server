@@ -8,7 +8,7 @@ const authUtils = require('../../modules/utils/authUtils');
 const upload = require('../../config/multer');
 
 // 신규 아티클 더보기
-router.get('/new', async(req,res)=>{
+router.get('/articles/new', async(req,res)=>{
     const getNewArticleQuery = 'SELECT * FROM article ORDER BY date DESC';
     const getNewArticleResult = await db.queryParam_None(getNewArticleQuery);
 
@@ -20,7 +20,7 @@ router.get('/new', async(req,res)=>{
 
 });
 // 신규 아티클 하나
-router.get('/new/:article_idx', async(req,res)=>{
+router.get('/:article_idx', async(req,res)=>{
     const idx  = req.params.article_idx;
 
 	const getOneNewArticleQuery = 'SELECT * FROM article WHERE article_idx = ?'
