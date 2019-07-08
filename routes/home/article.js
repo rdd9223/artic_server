@@ -9,7 +9,7 @@ const upload = require('../../config/multer');
 
 // 신규 아티클 더보기
 router.get('/articles/new', async (req, res) => {
-	const getNewArticleQuery = 'SELECT * FROM article ORDER BY date DESC';
+	const getNewArticleQuery = 'SELECT * FROM artic.article ORDER BY date DESC';
 	const getNewArticleResult = await db.queryParam_None(getNewArticleQuery);
 
 	if (!getNewArticleResult) {
@@ -43,7 +43,7 @@ router.get('/:article_idx/new', async (req, res) => {
 //최근 읽은 아티클
 router.get('/history', authUtils.isLoggedin, async (req, res) => {
 	const user_idx = req.decoded.idx;
-	const getHistory = 'SELECT * FROM artic.read WHERE user_idx = ? ORDER BY date DESC';
+	const getHistory = 'SELECT DISTINCT article.* FROM artic.read, artic.article WHERE read.article_idx = article.article_idx AND user_idx = ? ORDER BY date DESC';
 	const getHistoryResult = await db.queryParam_Arr(getHistory, [user_idx]);
 
 	if (!getHistoryResult) {
@@ -52,7 +52,6 @@ router.get('/history', authUtils.isLoggedin, async (req, res) => {
 		if (getHistoryResult.length == 0) {
 			res.status(200).send(defaultRes.successFalse(statusCode.NO_CONTENT, resMessage.HOME_HISTORY_NO));
 		} else {
-			console.log(getHistoryResult.length);
 			res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_HISTORY_SUCESS, getHistoryResult));
 		}
 
