@@ -12,15 +12,19 @@ const Notification = require('../../models/notificationSchema'); //코드에 쓸
 // newArticle = 0
 // recommend = 1
 // notRead = 2
+
+// newArticle code --> route/archive/:archive_idx/article
 router.get('/', authUtils.isLoggedin, async (req, res) => {
 	const userIdx = req.decoded.idx
 	//오름차순 = 1, 내림차순 = -1
-	console.log(req.body);
-    Notification.find(userIdx).sort({ date: -1 })
-        .then((allNotifications) => {
-            res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.READ_FAIL, allNotifications));
+
+    Notification.findByNotification(userIdx)
+        .then((notifications) => {
+			console.log(notifications)
+            //res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.READ_FAIL, allNotifications));
         }).catch((err) => {
-            res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+			console.log(err)
+            //res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
     });
 })
 

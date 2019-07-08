@@ -15,12 +15,21 @@ router.get('/', authUtil.isLoggedin, async (req, res) => {
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_IDX));
 	} else {
 		const getUserInfoQuery = 'SELECT * FROM user WHERE user_idx=?';
-		const getUserInfoResult = await db.queryParam_Parse(getUserInfoQuery, [req.decoded.idx]);
-
+		const getUserInfoResult = await db.queryParam_Arr(getUserInfoQuery, [req.decoded.idx]);
+		var userIntro = getUserInfoResult[0].user_intro;
+		if(!userIntro){
+			userIntro = "";
+		}
+		const userInfo = {
+			userId: getUserInfoResult[0].user_id,
+			userImg: getUserInfoResult[0].user_img,
+			userName: getUserInfoResult[0].user_name,
+			userIntro: userIntro
+		}
 		if (!getUserInfoResult) {
 			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_USER));
 		} else {
-			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_USER_DATA, getUserInfoResult));
+			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.FIND_USER_DATA, userInfo));
 		}
 	}
 });

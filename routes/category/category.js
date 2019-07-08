@@ -45,9 +45,9 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 				
 				for (var j = 0; j < getIsScrapedResult.length; j++) {
 					if (archiveIdx != getIsScrapedResult[j].archive_idx) {
-						archive.category_scrap = "notScrap"
+						archive.scrap = false;
 					} else {
-						archive.category_scrap = "Scrap"
+						archive.scrap = true;
 					}
 				}
 			}

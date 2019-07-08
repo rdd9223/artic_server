@@ -139,9 +139,9 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
                 console.log(selectArticleIdxResult[0].article_idx);
                 const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)'; //아카이브아티클
                 const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
-				// 영우 알림
-				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = 3';
-				const getAddArchiveUserResult = await db.queryParam_None(getAddArchiveUserQuery);
+				// 새 아티클 알림
+				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
+				const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
 
 				Notification.create({
 					user_idx: getAddArchiveUserResult,
