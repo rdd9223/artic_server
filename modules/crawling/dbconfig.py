@@ -18,10 +18,14 @@ except TypeError:
 # YYYY/mm/dd HH:MM:SS 형태의 시간 출력
 date = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
 
+tmp = link.split('/')
+domain = tmp[2]
+
 print(title)
 print(output)
 print(link)
 print(date)
+print(domain)
 # Connect to the database
 conn = pymysql.connect(host='artic.cvvhkxkqobt2.ap-northeast-2.rds.amazonaws.com',
                        user='rdd9223',
@@ -30,8 +34,8 @@ conn = pymysql.connect(host='artic.cvvhkxkqobt2.ap-northeast-2.rds.amazonaws.com
                        charset='utf8')
 try:
     with conn.cursor() as cursor:
-        sql = 'INSERT INTO article (article_title, thumnail, link, date) VALUES (%s, %s, %s, %s)'
-        cursor.execute(sql, (title, output, link, date))
+        sql = 'INSERT INTO article (article_title, thumnail, link, domain, date) VALUES (%s, %s, %s, %s, %s)'
+        cursor.execute(sql, (title, output, link, domain, date))
     conn.commit()
     print(cursor.lastrowid)
 finally:
