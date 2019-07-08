@@ -41,19 +41,27 @@ router.get('/:archive_idx', async (req, res) => {
 	if (!getOneNewArchiveResult) {
 		res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_NEW_FAIL));
 	} else {
-		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_NEW_SUCCESS, getOneNewArchiveResult));
+		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_NEW_SUCCESS, getOneNewArchiveResult[0]));
 	}
 });
 // 카테고리별 아카이브 4개만 보내주기 
 router.get('/category/:category_idx', async (req, res) => {
 	const idx = req.params.category_idx;
-	const getCategory = 'SELECT ca.category_title, ac.* FROM category ca, archive ac WHERE ca.category_idx = ? AND ac.category_idx = ? LIMIT 4';
-	const getCategoryResult = await db.queryParam_Arr(getCategory,[idx, idx]);
+	const getCategory = 'SELECT ca.category_title, ac.* FROM category ca, archive ac WHERE ca.category_idx = ? LIMIT 4';
+	const getCategoryResult = await db.queryParam_Arr(getCategory,[idx]);
+	const countArticle = 'SELECT count(*) count FROM archiveArticle WHERE archive_idx = ?'
+	//const countArticleResult = await db.queryParam_Arr(countArticle,[getCategoryResult[0].archive_idx])
 	if (!getCategoryResult) {
 		res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_CATE_FAIL));
 	} else if(getCategoryResult.length == 0){
 		res.status(200).send(defaultRes.successFalse(statusCode.NO_CONTENT, resMessage.HOME_CATE_EMPTY));
 	} else {
+		for(var i = 0, archive;archive = getCategoryResult[i]; i++){
+			const archiveIdx = archive.archive_idx;
+			const archiveCount = await db.queryParam_Arr(countArticle,[archiveIdx]);
+			console.log(archiveIdx);
+			archive.article_cnt = archiveCount[0].count;
+		}
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_CATE_SUCCESS, getCategoryResult));
 	}
 });
