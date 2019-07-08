@@ -18,16 +18,14 @@ router.post('/', async (req, res) => {
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ID_OR_PW_NULL_VALUE));
 	} else {
 		const selectResult = await db.queryParam_Parse(selectQuery, [id])
-
 		if (!selectResult) { //디비 조회 안되면
-			res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.MEMBERSHIP_DB_SELECT_ERROR));
+			res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ALREADY_USER));
 		} else if (selectResult.length == 1) { //디비 조회 결과 한개면
 			console.log(selectResult[0].salt)
 			console.log(selectResult[0].user_pw)
 			const hashedPw = await encrytion.onlyEncrytion(pw, selectResult[0].salt)
 
 			if (selectResult[0].user_pw == hashedPw.hashedPassword) {
-
 				const tokenValue = jwt.sign(selectResult[0]);
 				//  const decodedJwt = jwt.verify(tokenValue.token);
 				//  console.log(decodedJwt); -> 토큰 확인할때 사용
