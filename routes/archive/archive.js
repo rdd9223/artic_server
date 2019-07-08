@@ -148,10 +148,10 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 					article_idx: articleIdx,
 					notification_type: 0
 				}).then((result) => {
-					res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, result));
+					res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, result));
 				}).catch((err) => {
-					res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
-				});;
+					res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
+				});
 			});
 			if (insertTransaction === undefined) {
 				res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));
