@@ -27,6 +27,7 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 	const getNewArticleCount = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ? '; //해당 아카이브에 들어있는 아티클개수
 	const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx';
 	const getIsScrapedQuery = 'SELECT aa.archive_idx FROM archiveAdd aa, archiveCategory ac WHERE ac.category_idx = ? AND aa.user_idx = ?';
+	const getCategoryNameQuery = 'SELECT category_title FROM category WHERE category_idx = ?';
 
 	// console.log(getIsScrapedResult);
 	if (!getNewArchiveResult) {
@@ -42,6 +43,8 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 				const archiveCategoryResult = await db.queryParam_Arr(getArchiveCategoryQuery, [archiveIdx]) // 스트레스 ,, 
 				archive.category_all = archiveCategoryResult
 				const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [req.params.category_idx, userIdx]);
+				const getCategoryNameResult = await db.queryParam_Arr(getCategoryNameQuery, [req.params.category_idx]);
+				archive_title = getCategoryNameResult[0];
 				
 				for (var j = 0; j < getIsScrapedResult.length; j++) {
 					if (archiveIdx != getIsScrapedResult[j].archive_idx) {
