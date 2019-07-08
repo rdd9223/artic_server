@@ -96,7 +96,6 @@ router.get('/category/:category_idx', async (req, res) => {
 		for (var i = 0, archive; archive = getCategoryResult[i]; i++) {
 			const archiveIdx = archive.archive_idx;
 			const archiveCount = await db.queryParam_Arr(countArticle, [archiveIdx]);
-			console.log(archiveIdx);
 			archive.article_cnt = archiveCount[0].count;
 		}
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_CATE_SUCCESS, getCategoryResult));

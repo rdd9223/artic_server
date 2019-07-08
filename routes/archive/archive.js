@@ -16,39 +16,39 @@ require('moment-timezone');
 
 //아카이브 등록
 router.post('/', upload.single('img'), authUtils.isLoggedin, async (req, res) => {
-    const user_idx = req.decoded.idx;
-    const archive_title = req.body.title;
-    const archive_img = req.file.location;
-    const categorymain_idx = req.body.category_main;
-    const categorysub_idx = req.body.category_sub;
-    const date = moment().format('YYYY-MM-DD HH:mm:ss');
+	const user_idx = req.decoded.idx;
+	const archive_title = req.body.title;
+	const archive_img = req.file.location;
+	const categorymain_idx = req.body.category_main;
+	const categorysub_idx = req.body.category_sub;
+	const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
-    if (user_idx != 12) {
-        res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
-    } else {
-        if (!archive_title || !archive_img || !categorymain_idx) {
-            res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.REGISTER_ARCHIVE_UNOPENED));
-        } else {
-            const archiveRegister = await db.Transaction(async (connection) => {
-                const InsertArchive1 = 'INSERT INTO archive (user_idx, archive_title, date, archive_img, category_idx) VALUES (?, ?, ?, ?, ?)';
-                const InsertArchiveResult1 = await connection.query(InsertArchive1, [user_idx, archive_title, date, archive_img, categorymain_idx]);
-                console.log("0");
-                const archiveIdx = InsertArchiveResult1.insertId
-                const InsertAchiveCategory1 = 'INSERT INTO archiveCategory (archive_idx, category_idx) VALUES (?, ?)';
-                const InsertArchiveCategoryResult1 = await connection.query(InsertAchiveCategory1, [archiveIdx, categorymain_idx]);
-                console.log("2");
-                if(categorysub_idx != undefined) {
-                    const InsertArchiveCategoryResult2 = await connection.query(InsertAchiveCategory1, [archiveIdx, categorysub_idx]);
-                }
-                console.log("1");
-            });
-            if (!archiveRegister) {
-                res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.REGISTER_ARCHIVE_FAIL));
-            } else {
-                res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.REGISTER_ARCHIVE_SUCCESS));
-            }
-        }
-    }
+	if (user_idx != 12) {
+		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
+	} else {
+		if (!archive_title || !archive_img || !categorymain_idx) {
+			res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.REGISTER_ARCHIVE_UNOPENED));
+		} else {
+			const archiveRegister = await db.Transaction(async (connection) => {
+				const InsertArchive1 = 'INSERT INTO archive (user_idx, archive_title, date, archive_img, category_idx) VALUES (?, ?, ?, ?, ?)';
+				const InsertArchiveResult1 = await connection.query(InsertArchive1, [user_idx, archive_title, date, archive_img, categorymain_idx]);
+				console.log("0");
+				const archiveIdx = InsertArchiveResult1.insertId
+				const InsertAchiveCategory1 = 'INSERT INTO archiveCategory (archive_idx, category_idx) VALUES (?, ?)';
+				const InsertArchiveCategoryResult1 = await connection.query(InsertAchiveCategory1, [archiveIdx, categorymain_idx]);
+				console.log("2");
+				if (categorysub_idx != undefined) {
+					const InsertArchiveCategoryResult2 = await connection.query(InsertAchiveCategory1, [archiveIdx, categorysub_idx]);
+				}
+				console.log("1");
+			});
+			if (!archiveRegister) {
+				res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.REGISTER_ARCHIVE_FAIL));
+			} else {
+				res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.REGISTER_ARCHIVE_SUCCESS));
+			}
+		}
+	}
 
 });
 
@@ -97,71 +97,73 @@ router.delete('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 
 // 아티클 등록
 router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
-    const user_idx = req.decoded.idx;
-    const archiveIdx = req.params.archive_idx
-    const url = req.body.url
+	const user_idx = req.decoded.idx;
+	const archiveIdx = req.params.archive_idx
+	const url = req.body.url
 
-    if (user_idx != 12) {
-        res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.ARTICLE_NO_ADD_AUTH))
-    } else {
-        //크롤링
-        // var options = {
-        //     mode: 'text',
-        //     pythonPath: '',
-        //     //서버 올린 후 경로 수정 -> /usr/bin/python3
-        //     pythonOptions: ['-u'],
-        //     scriptPath: __dirname,
-        //     args: [url]
-        // };
-        const selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ?'; //아카이브 idx가져오기
-        const selectArchiveResult = await db.queryParam_Arr(selectArchiveQuery,[archiveIdx]);
+	if (user_idx != 12) {
+		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.ARTICLE_NO_ADD_AUTH))
+	} else {
+		//크롤링
+		// var options = {
+		//     mode: 'text',
+		//     pythonPath: '',
+		//     //서버 올린 후 경로 수정 -> /usr/bin/python3
+		//     pythonOptions: ['-u'],
+		//     scriptPath: __dirname,
+		//     args: [url]
+		// };
+		const selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ?'; //아카이브 idx가져오기
+		const selectArchiveResult = await db.queryParam_Arr(selectArchiveQuery, [archiveIdx]);
 
-        if (selectArchiveResult.length == 0) {
-            res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
-        } else {
-            function python() {
-                return new Promise((resolve, reject) => {
-                    PythonShell.PythonShell.run('dbconfig.py', crawlingoption(url), function (err, results) {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            console.log('results: %j', results);
-                            resolve(results);
-                        }
-                    });
-                })
-            }
-            await python(url);
-            const insertTransaction = await db.Transaction(async (connection) => {
-                const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
-                const selectArticleIdxResult = await connection.query(selectArticleIdx);
-                const articleIdx = selectArticleIdxResult[0].article_idx
-                console.log(selectArticleIdxResult[0].article_idx);
-                const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)'; //아카이브아티클
-                const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
+		if (selectArchiveResult.length == 0) {
+			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
+		} else {
+			function python() {
+				return new Promise((resolve, reject) => {
+					PythonShell.PythonShell.run('dbconfig.py', crawlingoption(url), function (err, results) {
+						if (err) {
+							reject(err);
+						} else {
+							console.log('results: %j', results);
+							resolve(results);
+						}
+					});
+				})
+			}
+			await python(url);
+			var transactionResult = 0;
+			const insertTransaction = await db.Transaction(async (connection) => {
+				const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
+				const selectArticleIdxResult = await connection.query(selectArticleIdx);
+				const articleIdx = selectArticleIdxResult[0].article_idx
+				console.log(selectArticleIdxResult[0].article_idx);
+				const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)'; //아카이브아티클
+				const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
 				// 새 아티클 알림
 				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
 				const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
-
+				//지니 프로미스 처리
 				Notification.create({
 					user_idx: getAddArchiveUserResult,
 					article_idx: articleIdx,
 					notification_type: 0
-				}).then((result) => {
-					res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, result));
-				}).catch((err) => {
-					res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
-				});;
+				}, (err, result) => {
+					if (err) {
+						res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
+					} else {
+						return result;
+					}
+				});
 			});
+
 			if (insertTransaction === undefined) {
 				res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));
 			} else {
 				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS));
 			}
-
 		}
 	}
-
 });
 
 // 아티클 목록 (신규 순)
