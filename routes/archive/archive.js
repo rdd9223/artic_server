@@ -131,7 +131,7 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
                     });
                 })
             }
-            await python(url);
+			await python(url);
             const insertTransaction = await db.Transaction(async (connection) => {
                 const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
                 const selectArticleIdxResult = await connection.query(selectArticleIdx);
@@ -143,20 +143,24 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
 				const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
 
-				Notification.create({
+				for (let i = 0, userData; userData = getAddArchiveUserResult[i]; i++) {
+					userData.isRead = false;	
+				}
+				
+				result = await Notification.create({
 					user_idx: getAddArchiveUserResult,
 					article_idx: articleIdx,
 					notification_type: 0
-				}).then((result) => {
-					res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, result));
-				}).catch((err) => {
-					res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
+				// }).then((result) => {
+				// 	res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, result));
+				// }).catch((err) => {
+				// 	res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
 				});
 			});
 			if (insertTransaction === undefined) {
 				res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));
 			} else {
-				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS));
+				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS, result));
 			}
 
 		}

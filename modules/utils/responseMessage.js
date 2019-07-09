@@ -43,7 +43,7 @@ module.exports =  {
 	MODIFY_ARTICLE_SUCCESS: "아티클 수정 성공",
 	
 	EMPTY_TOKEN: "헤더에 토큰이 없음",
-	EXPRIED_TOKEN: "유효기간이 지난 토큰",
+	EXPIRED_TOKEN: "유효기간이 지난 토큰",
 	INVALID_TOKEN: "잘못된 토큰",
 
     UPDATE_ARTICLE_SUCCESS: "아티클 수정 성공",
@@ -97,6 +97,10 @@ module.exports =  {
     SEARCH_ARCHIVE_SUCCESS: "아카이브 검색 성공",
     ARCHIVE_ARTICLE_COUNT_FAIL: "아티클 갯수 조회 실패",
     ARCHIVE_CATEGORY_FAIL: "아카이브 카테고리 조회 실패",
-    ARCHIVE_SCRAP_CHECK_FAIL: "아카이브 스크랩 유무 조회 실패",
+	ARCHIVE_SCRAP_CHECK_FAIL: "아카이브 스크랩 유무 조회 실패",
+	
+	NOTIFICATION_READ_FAIL: "알림 조회 실패",
+	NOTIFICATION_READ_SUCCESS: "알림 조회 성공",
+	NOTIFICATION_NOT_EXIST: "알림이 존재하지 않음",
 
 }
