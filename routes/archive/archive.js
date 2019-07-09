@@ -150,66 +150,67 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 	const archiveIdx = req.params.archive_idx
 	const url = req.body.url
 
-	if (user_idx != 12) {
-		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.ARTICLE_NO_ADD_AUTH))
-	} else {
-		//크롤링
-		// var options = {
-		//     mode: 'text',
-		//     pythonPath: '',
-		//     //서버 올린 후 경로 수정 -> /usr/bin/python3
-		//     pythonOptions: ['-u'],
-		//     scriptPath: __dirname,
-		//     args: [url]
-		// };
-		const selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ?'; //아카이브 idx가져오기
-		const selectArchiveResult = await db.queryParam_Arr(selectArchiveQuery, [archiveIdx]);
+    if (user_idx != 12) {
+        res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.ARTICLE_NO_ADD_AUTH))
+    } else {
+        //크롤링
+        // var options = {
+        //     mode: 'text',
+        //     pythonPath: '',
+        //     //서버 올린 후 경로 수정 -> /usr/bin/python3
+        //     pythonOptions: ['-u'],
+        //     scriptPath: __dirname,
+        //     args: [url]
+        // };
+        const selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ?'; //아카이브 idx가져오기
+        const selectArchiveResult = await db.queryParam_Arr(selectArchiveQuery,[archiveIdx]);
 
-		if (selectArchiveResult.length == 0) {
-			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
-		} else {
-			function python() {
-				return new Promise((resolve, reject) => {
-					PythonShell.PythonShell.run('dbconfig.py', crawlingoption(url), function (err, results) {
-						if (err) {
-							reject(err);
-						} else {
-							console.log('results: %j', results);
-							resolve(results);
-						}
-					});
-				})
-			}
+        if (selectArchiveResult.length == 0) {
+            res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
+        } else {
+            function python() {
+                return new Promise((resolve, reject) => {
+                    PythonShell.PythonShell.run('dbconfig.py', crawlingoption(url), function (err, results) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            console.log('results: %j', results);
+                            resolve(results);
+                        }
+                    });
+                })
+            }
 			await python(url);
-			var transactionResult = 0;
-			const insertTransaction = await db.Transaction(async (connection) => {
-				const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
-				const selectArticleIdxResult = await connection.query(selectArticleIdx);
-				const articleIdx = selectArticleIdxResult[0].article_idx
-				console.log(selectArticleIdxResult[0].article_idx);
-				const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)'; //아카이브아티클
-				const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
+            const insertTransaction = await db.Transaction(async (connection) => {
+                const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
+                const selectArticleIdxResult = await connection.query(selectArticleIdx);
+                const articleIdx = selectArticleIdxResult[0].article_idx
+                console.log(selectArticleIdxResult[0].article_idx);
+                const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)'; //아카이브아티클
+                const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
 				// 새 아티클 알림
 				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
 				const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
-				//지니 프로미스 처리
-				Notification.create({
+
+				for (let i = 0, userData; userData = getAddArchiveUserResult[i]; i++) {
+					userData.isRead = false;	
+				}
+				
+				result = await Notification.create({
 					user_idx: getAddArchiveUserResult,
 					article_idx: articleIdx,
 					notification_type: 0
-				}, (err, result) => {
-					if (err) {
-						res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
-					} else {
-						return result;
-					}
+				// }).then((result) => {
+				// 	res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, result));
+				// }).catch((err) => {
+				// 	res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
 				});
 			});
 
 			if (insertTransaction === undefined) {
 				res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));
 			} else {
-				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS));
+				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS, result));
 			}
 		}
 	}

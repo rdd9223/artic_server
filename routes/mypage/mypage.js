@@ -40,7 +40,11 @@ router.put('/', upload.single('img'), authUtil.isLoggedin, async (req, res) => {
 	const intro = req.body.intro;
 	const name = req.body.name;
 	if (!img || !intro || !name) {
+<<<<<<< HEAD
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NO_USER_DATA));
+=======
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.SIGNUP_NULL_VALUE));
+>>>>>>> ec4c18689e1d17f3bb45ed24cc4b4a02b78b552d
 	} else {
 		const updateUserInfoQuery = "UPDATE user SET user_img = ?, user_intro = ?, user_name = ? WHERE user_idx = ?";
 		const updateUserInfoResult = await db.queryParam_Arr(updateUserInfoQuery, [img, intro, name, req.decoded.idx]);
@@ -56,11 +60,18 @@ router.put('/', upload.single('img'), authUtil.isLoggedin, async (req, res) => {
 router.get('/archive/scrap', authUtil.isLoggedin, async (req, res) => {
 	// 토큰을 받아 사용자 인증을 한다
 	console.log(req.decoded.idx);
-
+	
 	// archiveAdd 테이블에 user_idx에 해당하는 아카이브를 모두 조회한다, 해당하는 아카이브를 모두 가져온다
 	const findScrapArchiveQuery = 'SELECT * FROM archive, archiveAdd WHERE archiveAdd.user_idx = ? AND archiveAdd.archive_idx = archive.archive_idx';
+	const getCategoryNameQuery = 'SELECT category_title FROM category WHERE category_idx = ?';
 	const findScrapArchiveResult = await db.queryParam_Arr(findScrapArchiveQuery, [req.decoded.idx]);
-
+	
+	for (var i = 0, archive; archive = findScrapArchiveResult[i]; i++){
+		const categoryIdx = archive.category_idx;
+		const getCategoryNameResult = await db.queryParam_Arr(getCategoryNameQuery,[categoryIdx]);
+		archive.category_title = getCategoryNameResult[0].category_title;
+	}
+	
 	if (!findScrapArchiveResult) {
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.FIND_ADD_ARCHIVE_FAIL));
 	} else {

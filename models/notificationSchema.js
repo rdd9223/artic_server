@@ -6,20 +6,21 @@ moment.tz.setDefault("Asia/Seoul");
 
 const notificationSchema = new mongoose.Schema({
     user_idx: { type: Array, required: true},
-    article_idx: { type: Number, required: true},
+    article_idx: { type: Array, required: true},
     notification_type: { type: String, required: true}
 }, {
     versionKey: false
 });
 
-notificationSchema.statics.findByNotification = function(user_idx) {
+// 유저 해당 알림 가져오기
+notificationSchema.statics.findByUserIdx = function(user_idx) {
     return this.find({
-		'user_idx' : user_idx,
-		// 'article_idx' : article_idx,
-		// 'notification_type' : notification_type
+		'user_idx' : { "$elemMatch" : {'user_idx' : user_idx}}
 	});
 };
-
+// user_idx,
+// 'article_idx' : article_idx,
+// 'notification_type' : notification_type
 notificationSchema.pre('save', function() { 
     if (!this.date) this.date = moment().format('YYYY-MM-DD HH:mm:ss');
 });

@@ -44,7 +44,7 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 				archive.category_all = archiveCategoryResult
 				const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [req.params.category_idx, userIdx]);
 				const getCategoryNameResult = await db.queryParam_Arr(getCategoryNameQuery, [req.params.category_idx]);
-				archive_title = getCategoryNameResult[0];
+				archive.archive_title = getCategoryNameResult[0];
 				
 				for (var j = 0; j < getIsScrapedResult.length; j++) {
 					if (archiveIdx != getIsScrapedResult[j].archive_idx) {
