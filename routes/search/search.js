@@ -12,7 +12,7 @@ require('moment-timezone');
 router.get('/archive', authUtils.isLoggedin, async (req, res) => {
     const userIdx = req.decoded.idx;
     const keyword = req.query.keyword;
-    const getArchivesQuery = "SELECT * FROM artic.archive WHERE archive_title LIKE ?";
+    const getArchivesQuery = "SELECT distinct a.* FROM artic.archive a INNER JOIN artic.archiveCategory ac WHERE a.archive_title LIKE ? AND a.archive_idx = ac.archive_idx AND NOT ac.category_idx IN (1)";
     const getScrapCheckQuery = 'SELECT * FROM artic.archiveAdd WHERE user_idx = ? AND archive_idx = ?';
     const getArticleCntQuery = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ?';
     const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx';
@@ -22,6 +22,7 @@ router.get('/archive', authUtils.isLoggedin, async (req, res) => {
     if (archiveResult === undefined) {
         res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.SEARCH_ARCHIVE_FAIL));
     } else {
+        console.log(archiveResult);
         for (var i = 0, archive; archive = archiveResult[i]; i++) {
             const archiveIdx = archive.archive_idx;
 
@@ -91,5 +92,37 @@ router.get('/article', authUtils.isLoggedin, async (req, res) => {
         res.status(200).send(utils.successTrue(statusCode.OK, resMessage.SEARCH_ARTICLE_SUCCESS, articleListResult));
     }
 });
+
+
+// 추천 검색어
+router.get('/recommendation', authUtils.isLoggedin, async (req, res) => {
+    const getSearchWordQuery = 'SELECT search_word FROM artic.search WHERE search_idx IN (?,?,?,?,?)';
+    const randomArr = Rand(5, 7);
+    console.log(randomArr);
+    const getSearchWordResult = await db.queryParam_Arr(getSearchWordQuery, randomArr);
+    if(getSearchWordResult === undefined) {
+        res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.SEARCH_WORD_FAIL));
+    } else {
+        res.status(200).send(utils.successTrue(statusCode.OK, resMessage.SEARCH_WORD_SUCCESS, getSearchWordResult));
+    }
+});
+
+function Rand(n, m) {
+    var arr = Array();
+    var flag = true;
+    for(var i=0; i<n; i++){
+        flag = true;
+        var temp = Math.floor(Math.random() * m) + 1;
+        for(var j=0; j<arr.length; j++){
+            if (arr[j] == temp) { flag = false; }
+        }
+        if(flag == false) { 
+            i--;
+        } else {
+            arr[i] = temp;
+        }
+    }
+    return arr;
+} 
 
 module.exports = router;

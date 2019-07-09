@@ -55,6 +55,7 @@ module.exports =  {
     READ_ARTICLE_FAIL: "아티클 읽기 실패",
     SCRAP_ARTICLE_SUCCESS: "아티클 담기 성공",
     SCRAP_ARTICLE_FAIL: "아티클 담기 실패",
+    ARLEADY_SCRAP_ARTICLE: "아티클이 이미 담겨있음",
     NOT_ARCHIVE_OWNER: "아카이브 소유자가 아님",
     LIKE_ARTICLE_FAIL: "아티클 좋아요 실패",
     LIKE_ARTICLE_SUCCESS: "아티클 좋아요 성공",
@@ -91,6 +92,8 @@ module.exports =  {
 	FIND_ADD_ARCHIVE_SUCCESS: "담은 아카이브 조회 성공",
     FIND_ADD_ARCHIVE_FAIL: "담은 아카이브 조회 실패",
     
+    SEARCH_WORD_FAIL: "추천 검색어 실패",
+    SEARCH_WORD_SUCCESS: "추천 검색어 성공",
     SEARCH_ARTICLE_FAIL: "아티클 검색 실패",
     SEARCH_ARTICLE_SUCCESS: "아티클 검색 성공",
     SEARCH_ARCHIVE_FAIL: "아카이브 검색 실패",
