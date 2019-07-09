@@ -15,32 +15,54 @@ const crawlingoption = require('../../modules/crawling/crawlingoption')
 require('moment-timezone');
 
 //아카이브 등록
+// 관리자 아카이브 등록시 - title, img, category_main, category_sub
+// 사용자 아카이브 등록시 - title, category_main
 router.post('/', upload.single('img'), authUtils.isLoggedin, async (req, res) => {
 	const user_idx = req.decoded.idx;
 	const archive_title = req.body.title;
-	const archive_img = req.file.location;
+	let archive_img = null;
 	const categorymain_idx = req.body.category_main;
 	const categorysub_idx = req.body.category_sub;
 	const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
 	if (user_idx != 12) {
-		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
+		if (!archive_title) {
+			res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.REGISTER_MY_ARCHIVE_UNOPENED));
+		} else {
+			console.log("관리자가 아닌 사람이 아카이브 등록할때")
+			const archiveRegistermy = await db.Transaction(async (connection) => {
+				const InsertArchive1 = 'INSERT INTO archive (user_idx, archive_title, date, category_idx) VALUES (?, ?, ?, ?)';
+				const InsertArchiveResult1 = await connection.query(InsertArchive1, [user_idx, archive_title, date, 1]);
+				const archiveIdx = InsertArchiveResult1.insertId
+				const InsertAchiveCategory1 = 'INSERT INTO archiveCategory (archive_idx, category_idx) VALUES (?, ?)';
+				const InsertArchiveCategoryResult1 = await connection.query(InsertAchiveCategory1, [archiveIdx, 1]);
+			});
+			if (!archiveRegistermy) {
+				res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.REGISTER_MY_ARCHIVE_FAIL));
+			} else {
+				res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.REGISTER_MY_ARCHIVE_SUCCESS));
+			}
+		}
 	} else {
+		console.log("관리자가 아카이브 등록할때")
+		console.log(req.file)
+		if (typeof req.file != "undefined") {
+			console.log("Hhhhh")
+			archive_img = req.file.location;
+		}
+		console.log("파일 받아오기 설정 했고")
 		if (!archive_title || !archive_img || !categorymain_idx) {
 			res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.REGISTER_ARCHIVE_UNOPENED));
 		} else {
 			const archiveRegister = await db.Transaction(async (connection) => {
 				const InsertArchive1 = 'INSERT INTO archive (user_idx, archive_title, date, archive_img, category_idx) VALUES (?, ?, ?, ?, ?)';
 				const InsertArchiveResult1 = await connection.query(InsertArchive1, [user_idx, archive_title, date, archive_img, categorymain_idx]);
-				console.log("0");
 				const archiveIdx = InsertArchiveResult1.insertId
 				const InsertAchiveCategory1 = 'INSERT INTO archiveCategory (archive_idx, category_idx) VALUES (?, ?)';
 				const InsertArchiveCategoryResult1 = await connection.query(InsertAchiveCategory1, [archiveIdx, categorymain_idx]);
-				console.log("2");
 				if (categorysub_idx != undefined) {
 					const InsertArchiveCategoryResult2 = await connection.query(InsertAchiveCategory1, [archiveIdx, categorysub_idx]);
 				}
-				console.log("1");
 			});
 			if (!archiveRegister) {
 				res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.REGISTER_ARCHIVE_FAIL));
@@ -91,6 +113,33 @@ router.delete('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.DELETE_ARCHIVE_FAIL));
 		} else {
 			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.DELETE_ARCHIVE_SUCCESS));
+		}
+	}
+});
+
+// 아카이브 스크랩(담기)
+router.post('/add/:archive_idx', authUtils.isLoggedin, async (req, res) => {
+	const archiveIdx = req.params.archive_idx;
+	const userIdx = req.decoded.idx;
+
+	const getAddArchiveQuery = 'SELECT * FROM archiveAdd WHERE user_idx = ? AND archive_idx = ?'
+	const insertAddArchiveQuery = 'INSERT INTO archiveAdd (user_idx, archive_idx) VALUES (?, ?)';
+	const deleteAddArchiveQuery = 'DELETE FROM archiveAdd WHERE user_idx = ? AND archive_idx = ?'
+
+	const getAddArchiveResult = await db.queryParam_Parse(getAddArchiveQuery, [userIdx, archiveIdx]);
+	if (getAddArchiveResult.length == 0) {
+		const insertAddArchiveResult = await db.queryParam_Arr(insertAddArchiveQuery, [userIdx, archiveIdx]);
+		if (!insertAddArchiveResult) {
+			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.INSERT_ADD_ARCHIVE_FAIL));
+		} else {
+			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.INSERT_ADD_ARCHIVE_SUCCESS, insertAddArchiveResult));
+		}
+	} else {
+		const deleteAddArchiveResult = await db.queryParam_Arr(deleteAddArchiveQuery, [userIdx, archiveIdx]);
+		if (!deleteAddArchiveResult) {
+			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.DELETE_ARCHIVE_FAIL));
+		} else {
+			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.DELETE_ARCHIVE_SUCCESS, deleteAddArchiveResult));
 		}
 	}
 });
