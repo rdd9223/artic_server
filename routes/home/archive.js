@@ -40,7 +40,7 @@ router.get('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const getOneNewArchiveResult = await db.queryParam_Arr(getOneNewArchiveQuery, [idx]); ///아카이브 정보
 
 	//해당 아카이브 아티클 조회
-	const getArticles = 'SELECT at.* FROM article at, archiveArticle aa WHERE aa.archive_idx = ?'
+	const getArticles = 'SELECT at.* FROM article at, archiveArticle aa WHERE aa.article_idx = at.article_idx AND aa.archive_idx = ?'
 	const getArticlesResult = await db.queryParam_Arr(getArticles, [idx]);
 	//해당 아카이브 아티클의 좋아요 개수
 	for(var i = 0, article; article = getArticlesResult[i]; i++){
@@ -96,7 +96,6 @@ router.get('/category/:category_idx', async (req, res) => {
 		for (var i = 0, archive; archive = getCategoryResult[i]; i++) {
 			const archiveIdx = archive.archive_idx;
 			const archiveCount = await db.queryParam_Arr(countArticle, [archiveIdx]);
-			console.log(archiveIdx);
 			archive.article_cnt = archiveCount[0].count;
 		}
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_CATE_SUCCESS, getCategoryResult));

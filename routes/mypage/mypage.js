@@ -4,9 +4,9 @@ const utils = require('../../modules/utils/utils');
 const resMessage = require('../../modules/utils/responseMessage');
 const statusCode = require('../../modules/utils/statusCode');
 const db = require('../../modules/pool');
-const encrytion = require('../../modules/encrytion/encrytionModule');
 const jwt = require('../../modules/jwt');
 const authUtil = require('../../modules/utils/authUtils');
+const upload = require('../../config/multer')
 
 // 마이페이지 조회
 router.get('/', authUtil.isLoggedin, async (req, res) => {
@@ -17,7 +17,7 @@ router.get('/', authUtil.isLoggedin, async (req, res) => {
 		const getUserInfoQuery = 'SELECT * FROM user WHERE user_idx=?';
 		const getUserInfoResult = await db.queryParam_Arr(getUserInfoQuery, [req.decoded.idx]);
 		var userIntro = getUserInfoResult[0].user_intro;
-		if(!userIntro){
+		if (!userIntro) {
 			userIntro = "";
 		}
 		const userInfo = {
@@ -35,21 +35,19 @@ router.get('/', authUtil.isLoggedin, async (req, res) => {
 });
 
 // 마이페이지 수정
-router.put('/', authUtil.isLoggedin, async (req, res) => {
-	const img = req.body.img;
+router.put('/', upload.single('img'), authUtil.isLoggedin, async (req, res) => {
+	let img = req.file.location;
 	const intro = req.body.intro;
 	const name = req.body.name;
-
 	if (!img || !intro || !name) {
-		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.SIGNUP_NULL_VALUE));
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NO_USER_DATA));
 	} else {
 		const updateUserInfoQuery = "UPDATE user SET user_img = ?, user_intro = ?, user_name = ? WHERE user_idx = ?";
 		const updateUserInfoResult = await db.queryParam_Arr(updateUserInfoQuery, [img, intro, name, req.decoded.idx]);
-
 		if (!updateUserInfoResult) {
 			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.UPDATE_USER_DATA_FAIL));
 		} else {
-			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.UPDATE_USER_DATA_SUCCESS, updateUserInfoResult));
+			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.UPDATE_USER_DATA_SUCCESS));
 		}
 	}
 });

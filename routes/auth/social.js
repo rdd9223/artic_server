@@ -8,15 +8,19 @@ const utils = require('../../modules/utils/utils');
 const resMessage = require('../../modules/utils/responseMessage');
 const statusCode = require('../../modules/utils/statusCode');
 
-// facebook 로그인
-router.get('/login/facebook',
-    passport.authenticate('facebook')
+// router.get('/', (req, res) => {
+//     console.log(req.session.passport);
+//  });
+
+// kakao 로그인
+router.get('/login/kakao',
+    passport.authenticate('kakao')
 );
-// facebook 로그인 연동 콜백
-router.get('/login/facebook/callback',
-    passport.authenticate('facebook', {
-        successRedirect: '/auth/login/success',
-        failureRedirect: '/auth/login/fail'
+// kakao 로그인 연동 콜백
+router.get('/login/kakao/callback',
+    passport.authenticate('kakao', {
+        successRedirect: '/auth/social/login/success',
+        failureRedirect: '/auth/social/login/fail'
     })
 );
 router.get('/login/fail', (req, res) => {
@@ -24,6 +28,6 @@ router.get('/login/fail', (req, res) => {
 });
 router.get('/login/success', (req, res) => {
     console.log(req._passport.session);
-    res.status(200).send(utils.successTrue(statusCode.AUTH_OK, resMessage.LOGIN_SUCCESS, req._passport.session.user));
+    res.status(200).send(utils.successTrue(statusCode.AUTH_OK, resMessage.LOGIN_SUCCESS, req._passport.session.user.token));
 });
 module.exports = router;

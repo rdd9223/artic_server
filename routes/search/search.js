@@ -96,7 +96,7 @@ router.get('/article', authUtils.isLoggedin, async (req, res) => {
 
 // 추천 검색어
 router.get('/recommendation', authUtils.isLoggedin, async (req, res) => {
-    const getSearchWordQuery = 'SELECT search_word FROM artic.search WHERE search_idx IN (?,?,?,?,?)';
+    const getSearchWordQuery = 'SELECT search_word FROM artic.search WHERE search_idx IN (?,?,?,?,?,?,?,?,?)';
     const randomArr = Rand(5, 7);
     console.log(randomArr);
     const getSearchWordResult = await db.queryParam_Arr(getSearchWordQuery, randomArr);
