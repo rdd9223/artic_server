@@ -22,14 +22,14 @@ router.get('/', async (req, res) => {
 router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => {
 
 	const userIdx = req.decoded.idx;
-	const getNewArchiveQuery = 'SELECT ar.*  FROM archive ar INNER JOIN category ca WHERE ar.category_idx = ca.category_idx AND user_idx = 12 ORDER BY date DESC';
-	const getNewArchiveResult = await db.queryParam_None(getNewArchiveQuery);
+	const category_idx = req.params.category_idx
+	const getNewArchiveQuery = 'SELECT * FROM archive WHERE category_idx = ? AND user_idx = 12 ORDER BY date DESC';
+	const getNewArchiveResult = await db.queryParam_Arr(getNewArchiveQuery,[category_idx]);
 	const getNewArticleCount = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ? '; //해당 아카이브에 들어있는 아티클개수
 	const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx';
 	const getIsScrapedQuery = 'SELECT aa.archive_idx FROM archiveAdd aa, archiveCategory ac WHERE ac.category_idx = ? AND aa.user_idx = ?';
-	const getCategoryNameQuery = 'SELECT category_title FROM category WHERE category_idx = ?';
 
-	// console.log(getIsScrapedResult);
+	 console.log(getNewArchiveResult);
 	if (!getNewArchiveResult) {
 		res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ARCHIVE_LIST_FAIL));
 	} else {
@@ -43,8 +43,7 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 				const archiveCategoryResult = await db.queryParam_Arr(getArchiveCategoryQuery, [archiveIdx]) // 스트레스 ,, 
 				archive.category_all = archiveCategoryResult
 				const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [req.params.category_idx, userIdx]);
-				const getCategoryNameResult = await db.queryParam_Arr(getCategoryNameQuery, [req.params.category_idx]);
-				archive.archive_title = getCategoryNameResult[0];
+				archive.archive_title = getNewArchiveResult[0].archive_title;
 				
 				for (var j = 0; j < getIsScrapedResult.length; j++) {
 					if (archiveIdx != getIsScrapedResult[j].archive_idx) {

@@ -28,6 +28,6 @@ router.get('/login/fail', (req, res) => {
 });
 router.get('/login/success', (req, res) => {
     console.log(req._passport.session);
-    res.status(200).send(utils.successTrue(statusCode.AUTH_OK, resMessage.LOGIN_SUCCESS, token));
+    res.status(200).send(utils.successTrue(statusCode.AUTH_OK, resMessage.LOGIN_SUCCESS, req._passport.session.user));
 });
 module.exports = router;
