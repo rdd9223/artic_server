@@ -40,11 +40,7 @@ router.put('/', upload.single('img'), authUtil.isLoggedin, async (req, res) => {
 	const intro = req.body.intro;
 	const name = req.body.name;
 	if (!img || !intro || !name) {
-<<<<<<< HEAD
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NO_USER_DATA));
-=======
-		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.SIGNUP_NULL_VALUE));
->>>>>>> ec4c18689e1d17f3bb45ed24cc4b4a02b78b552d
 	} else {
 		const updateUserInfoQuery = "UPDATE user SET user_img = ?, user_intro = ?, user_name = ? WHERE user_idx = ?";
 		const updateUserInfoResult = await db.queryParam_Arr(updateUserInfoQuery, [img, intro, name, req.decoded.idx]);
