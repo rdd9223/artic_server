@@ -8,6 +8,8 @@ router.use('/mypage', require('./mypage/index'));
 router.use('/archive', require('./archive/index'));
 router.use('/notification', require('./notification/index'));
 router.use('/category', require('./category/index'));
+router.use('/practice', require('./practice'));
+
 router.use('/search', require('./search/index'));
 
 module.exports = router;
