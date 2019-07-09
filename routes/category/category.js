@@ -8,7 +8,7 @@ const authUtils = require('../../modules/utils/authUtils');
 
 // 카테고리 전체조회
 router.get('/', async (req, res) => {
-	const getAllCategoryQuery = 'SELECT * FROM category';
+	const getAllCategoryQuery = 'SELECT * FROM category WHERE category_idx > 1';
 	const getAllCategoryResult = await db.queryParam_None(getAllCategoryQuery);
 
 	if (!getAllCategoryResult) {
