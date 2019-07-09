@@ -13,7 +13,7 @@ const authUtil = {
 			const user = jwt.verify(token);
 
 			if(user == -3){
-				return res.json(util.successFalse(statusCode.UNAUTHORIZED, resMessage.EXPRIED_TOKEN));
+				return res.json(util.successFalse(statusCode.UNAUTHORIZED, resMessage.EXPIRED_TOKEN));
 			}else if (user == -2){
 				return res.json(util.successFalse(statusCode.UNAUTHORIZED, resMessage.INVALID_TOKEN));
 			}else{ 
@@ -33,7 +33,7 @@ const authUtil = {
 			console.log(user);
 
 			if(user == -3){
-				return res.json(util.successFalse(statusCode.UNAUTHORIZED, resMessage.EXPRIED_TOKEN));
+				return res.json(util.successFalse(statusCode.UNAUTHORIZED, resMessage.EXPIRED_TOKEN));
 			}else if (user == -2){
 				return res.json(util.successFalse(statusCode.UNAUTHORIZED, resMessage.INVALID_TOKEN));
 			}else{
