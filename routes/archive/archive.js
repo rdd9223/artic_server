@@ -25,7 +25,7 @@ router.post('/', upload.single('img'), authUtils.isLoggedin, async (req, res) =>
 	const categorysub_idx = req.body.category_sub;
 	const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
-	if (user_idx != 12) {
+	if (user_idx != 1) {
 		if (!archive_title) {
 			res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.REGISTER_MY_ARCHIVE_UNOPENED));
 		} else {
@@ -82,7 +82,7 @@ router.put('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const archive_img = req.body.img;
 	const category_idx = req.body.category_idx;
 	const date = moment().format('YYYY-MM-DD HH:mm:ss');
-	if (user_idx != 12) {
+	if (user_idx != 1) {
 		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
 	} else {
 		const updateArchive = 'UPDATE archive SET archive_title = ?, date = ?, archive_img = ?, category_idx = ? WHERE user_idx = ? AND archive_idx = ?'
@@ -104,7 +104,7 @@ router.delete('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const idx = req.params.archive_idx;
 	const user_idx = req.decoded.idx;
 	const getArchiveCount = await db.queryParam_Arr('SELECT COUNT(*) count FROM archive WHERE user_idx = ?', [user_idx])
-	if (user_idx != 12) {
+	if (user_idx != 1) {
 		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
 	} else {
 		const deleteArchive = 'DELETE FROM archive WHERE archive_idx = ?';
@@ -150,7 +150,7 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 	const archiveIdx = req.params.archive_idx
 	const url = req.body.url
 
-    if (user_idx != 12) {
+    if (user_idx != 1) {
         res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.ARTICLE_NO_ADD_AUTH))
     } else {
         //크롤링

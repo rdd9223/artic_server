@@ -23,7 +23,7 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 
 	const userIdx = req.decoded.idx;
 	const category_idx = req.params.category_idx
-	const getNewArchiveQuery = 'SELECT * FROM archive WHERE category_idx = ? AND user_idx = 12 ORDER BY date DESC';
+	const getNewArchiveQuery = 'SELECT * FROM archive WHERE category_idx = ? AND user_idx = 1 ORDER BY date DESC';
 	const getNewArchiveResult = await db.queryParam_Arr(getNewArchiveQuery,[category_idx]);
 	const getNewArticleCount = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ? '; //해당 아카이브에 들어있는 아티클개수
 	const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx';
