@@ -4,12 +4,24 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const session = require('express-session'); // 세션 설정
+const passport = require('passport');
+const passportConfig = require('./config/passport');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
 var mongoose = require('./config/mongoose');
 mongoose();
+
+
+//passport setup
+app.use(session({ secret: '비밀코드', resave: true, saveUninitialized: false })); // 세션 활성화
+app.use(passport.initialize()); // passport 구동 (꼭 필요)
+app.use(passport.session()); // 세션 연결 (꼭 필요)
+passportConfig(); // 이 부분 추가
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
