@@ -92,10 +92,11 @@ router.get('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 });
 // 카테고리별 아카이브 4개만 보내주기 
 router.get('/category/:category_idx', authUtils.isLoggedin, async (req, res) => {
+	//카테고리에 해당하는 아카이브들 안가져옴
 	const idx = req.params.category_idx;
 	const userIdx = req.decoded.idx;
-	const getCategory = 'SELECT ca.category_title, ac.* FROM category ca, archive ac WHERE ca.category_idx = ? LIMIT 4';
-	const getCategoryResult = await db.queryParam_Arr(getCategory, [idx]);
+	const getCategory = 'SELECT ca.category_title, ac.* FROM category ca, archive ac WHERE ca.category_idx = ? AND ac.category_idx = ? LIMIT 4';
+	const getCategoryResult = await db.queryParam_Arr(getCategory, [idx, idx]);
 	const countArticle = 'SELECT count(*) count FROM archiveArticle WHERE archive_idx = ?'
 	const getIsScrapedQuery = 'SELECT aa.archive_idx FROM archiveAdd aa, archiveCategory ac WHERE ac.category_idx = ? AND aa.user_idx = ?';
 	//const countArticleResult = await db.queryParam_Arr(countArticle,[getCategoryResult[0].archive_idx])
