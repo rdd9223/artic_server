@@ -18,6 +18,12 @@ notificationSchema.statics.findByUserIdx = function(user_idx) {
 		'user_idx' : { "$elemMatch" : {'user_idx' : user_idx}}
 	});
 };
+
+notificationSchema.statics.updateFlag = function(user_idx){
+	return this.update({
+		'user_idx' : { "$elemMatch" : {'user_idx' : user_idx}}
+	})
+}
 // user_idx,
 // 'article_idx' : article_idx,
 // 'notification_type' : notification_type
