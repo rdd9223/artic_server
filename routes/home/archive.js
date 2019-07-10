@@ -82,11 +82,13 @@ router.get('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	}
 });
 // 카테고리별 아카이브 4개만 보내주기 
-router.get('/category/:category_idx', async (req, res) => {
+router.get('/category/:category_idx', authUtils.isLoggedin, async (req, res) => {
 	const idx = req.params.category_idx;
+	const userIdx = req.decoded.idx;
 	const getCategory = 'SELECT ca.category_title, ac.* FROM category ca, archive ac WHERE ca.category_idx = ? LIMIT 4';
 	const getCategoryResult = await db.queryParam_Arr(getCategory, [idx]);
 	const countArticle = 'SELECT count(*) count FROM archiveArticle WHERE archive_idx = ?'
+	const getIsScrapedQuery = 'SELECT aa.archive_idx FROM archiveAdd aa, archiveCategory ac WHERE ac.category_idx = ? AND aa.user_idx = ?';
 	//const countArticleResult = await db.queryParam_Arr(countArticle,[getCategoryResult[0].archive_idx])
 	if (!getCategoryResult) {
 		res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_CATE_FAIL));
@@ -96,7 +98,15 @@ router.get('/category/:category_idx', async (req, res) => {
 		for (var i = 0, archive; archive = getCategoryResult[i]; i++) {
 			const archiveIdx = archive.archive_idx;
 			const archiveCount = await db.queryParam_Arr(countArticle, [archiveIdx]);
+			const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [req.params.category_idx, userIdx]);
 			archive.article_cnt = archiveCount[0].count;
+			for (var j = 0; j < getIsScrapedResult.length; j++) {
+				if (archiveIdx != getIsScrapedResult[j].archive_idx) {
+					archive.scrap = false;
+				} else {
+					archive.scrap = true;
+				}
+			}
 		}
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_CATE_SUCCESS, getCategoryResult));
 	}
