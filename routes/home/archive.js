@@ -8,13 +8,14 @@ const authUtils = require('../../modules/utils/authUtils');
 const upload = require('../../config/multer');
 
 // 신규 아카이브 더보기 (최신순 정렬)
-router.get('/archives/new', async (req, res) => {
+router.get('/archives/new', authUtils.isLoggedin, async (req, res) => {
+	const userIdx = req.decoded.idx;
 	const getNewArchiveQuery = 'SELECT ar.*  FROM archive ar INNER JOIN category ca where ar.category_idx = ca.category_idx ORDER BY date DESC';
 	const getNewArchiveResult = await db.queryParam_None(getNewArchiveQuery);
 	const getNewArticleCount = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ? '; //해당 아카이브에 들어있는 아티클개수
 	// ++
 	const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx'
-
+	const getIsScrapedQuery = 'SELECT archive_idx FROM archiveAdd WHERE archive_idx = ? AND user_idx = ?';
 
 	if (!getNewArchiveResult) {
 		res.status(200).send(defaultRes.successFalse(statusCode.DB_ERROR, resMessage.HOME_NEW_FAIL));
@@ -23,16 +24,24 @@ router.get('/archives/new', async (req, res) => {
 			const archiveIdx = archive.archive_idx;
 			const archiveCount = await db.queryParam_Arr(getNewArticleCount, [archiveIdx])
 			archive.article_cnt = archiveCount[0].count
-
-			// ++
+			const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [archiveIdx, userIdx]);
+			archive.scrap = false;
+			for (var j = 0; j < getIsScrapedResult.length; j++) {
+				if (archiveIdx != getIsScrapedResult[j].archive_idx) {
+					archive.scrap = false;
+				} else {
+					archive.scrap = true;
+				}
+			}
 			const archiveCategoryResult = await db.queryParam_Arr(getArchiveCategoryQuery, [archiveIdx])
 			archive.category_all = archiveCategoryResult
+
+
 		}
 		res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.HOME_NEW_SUCCESS, getNewArchiveResult));
 	}
 });
 // 신규 아카이브 하나보기
-//아카이브 제목, 아카이브 스크랩 여부 해당 아카이브의 아티클들+아티클들의 좋아요개수 +아티클들의 담기 여부
 router.get('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const userIdx = req.decoded.idx;
 	const idx = req.params.archive_idx;
@@ -43,10 +52,10 @@ router.get('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const getArticles = 'SELECT at.* FROM article at, archiveArticle aa WHERE aa.article_idx = at.article_idx AND aa.archive_idx = ?'
 	const getArticlesResult = await db.queryParam_Arr(getArticles, [idx]);
 	//해당 아카이브 아티클의 좋아요 개수
-	for(var i = 0, article; article = getArticlesResult[i]; i++){
+	for (var i = 0, article; article = getArticlesResult[i]; i++) {
 		const articleIdx = article.article_idx;
 		const getLikeCntQuery = 'SELECT COUNT(article_idx) cnt FROM artic.like WHERE article_idx = ?';
-		const getLikeCheckQuery = 'SELECT * FROM artic.like WHERE user_idx = ? AND article_idx = ?';		
+		const getLikeCheckQuery = 'SELECT * FROM artic.like WHERE user_idx = ? AND article_idx = ?';
 		const likeCntResult = await db.queryParam_Arr(getLikeCntQuery, [articleIdx]);
 		const likeCheckResult = await db.queryParam_Arr(getLikeCheckQuery, [userIdx, articleIdx]);
 
