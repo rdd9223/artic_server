@@ -47,7 +47,7 @@ router.put('/', upload.single('img'), authUtil.isLoggedin, async (req, res) => {
 		if (!updateUserInfoResult) {
 			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.UPDATE_USER_DATA_FAIL));
 		} else {
-			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.UPDATE_USER_DATA_SUCCESS));
+			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.UPDATE_USER_DATA_SUCCESS,updateUserInfoResult));
 		}
 	}
 });
