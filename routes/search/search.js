@@ -12,7 +12,7 @@ require('moment-timezone');
 router.get('/archive', authUtils.isLoggedin, async (req, res) => {
     const userIdx = req.decoded.idx;
     const keyword = req.query.keyword;
-    const getArchivesQuery = "SELECT distinct a.* FROM artic.archive a INNER JOIN artic.archiveCategory ac WHERE a.archive_title LIKE ? AND a.archive_idx = ac.archive_idx AND NOT ac.category_idx IN (1)";
+    const getArchivesQuery = "SELECT distinct a.* FROM artic.archive a INNER JOIN artic.archiveCategory ac WHERE a.archive_title LIKE ? AND a.archive_idx = ac.archive_idx AND NOT ac.category_idx IN (1) ORDER BY date DESC";
     const getScrapCheckQuery = 'SELECT * FROM artic.archiveAdd WHERE user_idx = ? AND archive_idx = ?';
     const getArticleCntQuery = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ?';
     const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx';
@@ -64,7 +64,7 @@ router.get('/archive', authUtils.isLoggedin, async (req, res) => {
 router.get('/article', authUtils.isLoggedin, async (req, res) => {
     const userIdx = req.decoded.idx;
     const keyword = req.query.keyword;
-    const getArchivesQuery = "SELECT * FROM artic.article WHERE article_title LIKE ?";
+    const getArchivesQuery = "SELECT * FROM artic.article WHERE article_title LIKE ? ORDER BY date DESC";
     const getLikeCntQuery = 'SELECT COUNT(article_idx) cnt FROM artic.like WHERE article_idx = ?';
     const getLikeCheckQuery = 'SELECT * FROM artic.like WHERE user_idx = ? AND article_idx = ?';
     
@@ -93,11 +93,10 @@ router.get('/article', authUtils.isLoggedin, async (req, res) => {
     }
 });
 
-
 // 추천 검색어
 router.get('/recommendation', authUtils.isLoggedin, async (req, res) => {
-    const getSearchWordQuery = 'SELECT search_word FROM artic.search WHERE search_idx IN (?,?,?,?,?)';
-    const randomArr = Rand(5, 7);
+    const getSearchWordQuery = 'SELECT search_word FROM artic.search WHERE search_idx IN (?,?,?,?,?,?,?,?,?)';
+    const randomArr = Rand(9, 10);
     console.log(randomArr);
     const getSearchWordResult = await db.queryParam_Arr(getSearchWordQuery, randomArr);
     if(getSearchWordResult === undefined) {
