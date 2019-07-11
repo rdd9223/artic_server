@@ -87,8 +87,8 @@ module.exports =  {
 	FIND_MY_ARCHIVE_SUCCESS: "내 아카이브 찾기 성공",
 	DELETE_ADD_ARCHIVE_FAIL: "아카이브 담기 취소 실패",
 	DELETE_ADD_ARCHIVE_SUCCESS: "아카이브 담기 취소 성공",
-	INSERT_ADD_ARCHIVE_FAIL: "아카이브 담기 실패",
-	INSERT_ADD_ARCHIVE_SUCCESS: "아카이브 담기 성공",
+	INSERT_ADD_ARCHIVE_FAIL: "스크랩 실패",
+	INSERT_ADD_ARCHIVE_SUCCESS: "스크랩 성공",
 	FIND_ADD_ARCHIVE_SUCCESS: "담은 아카이브 조회 성공",
     FIND_ADD_ARCHIVE_FAIL: "담은 아카이브 조회 실패",
     
