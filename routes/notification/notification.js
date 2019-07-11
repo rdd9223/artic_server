@@ -18,7 +18,7 @@ const Notification = require('../../models/notificationSchema'); //코드에 쓸
 
 // 모든 알림 불러오기
 router.get('/', authUtils.isLoggedin, async (req, res) => {
-	const userIdx = 10//req.decoded.idx;
+	const userIdx = req.decoded.idx;
 	//오름차순 = 1, 내림차순 = -1
 
 	Notification.find({
