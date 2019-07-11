@@ -117,7 +117,7 @@ router.delete('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	}
 });
 
-// 아카이브 스크랩(담기)
+// 아카이브 스크랩
 router.post('/add/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const archiveIdx = req.params.archive_idx;
 	const userIdx = req.decoded.idx;
