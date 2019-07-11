@@ -92,6 +92,7 @@ router.put('/read', authUtils.isLoggedin, async (req, res) => {
 
 // 추천 알림 (마지막 읽은 아티클의 카테고리 중, 무작위 5개(안 읽은 것))
 router.post('/1', authUtils.isLoggedin, async (req, res) => {
+	console.log(req.decoded.idx);
 	if (req.decoded.idx == 1) {
 		const getAllUserIdxQuery = 'SELECT user_idx FROM user WHERE user_idx != ?'
 		const getRecentViewArticleQuery = 'SELECT article_idx FROM `read` WHERE user_idx = ? ORDER BY date DESC LIMIT 1';

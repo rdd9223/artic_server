@@ -25,16 +25,18 @@ router.get('/archives/new', authUtils.isLoggedin, async (req, res) => {
 			const archiveCount = await db.queryParam_Arr(getNewArticleCount, [archiveIdx])
 			archive.article_cnt = archiveCount[0].count
 			const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [archiveIdx, userIdx]);
-			archive.scrap = false;
-			for (var j = 0; j < getIsScrapedResult.length; j++) {
-				if (archiveIdx != getIsScrapedResult[j].archive_idx) {
-					archive.scrap = false;
-				} else {
-					archive.scrap = true;
-				}
-			}
 			const archiveCategoryResult = await db.queryParam_Arr(getArchiveCategoryQuery, [archiveIdx])
 			archive.category_all = archiveCategoryResult
+			if (getIsScrapedResult[0] == undefined) {
+				archive.scrap = false;
+			} else {
+				if(archiveIdx == getIsScrapedResult[0].archive_idx){
+					archive.scrap = true;
+				} else {
+					archive.scrap = false;
+				}
+			}
+
 
 
 		}
@@ -110,11 +112,14 @@ router.get('/category/:category_idx', authUtils.isLoggedin, async (req, res) => 
 			const archiveCount = await db.queryParam_Arr(countArticle, [archiveIdx]);
 			const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [req.params.category_idx, userIdx]);
 			archive.article_cnt = archiveCount[0].count;
-			for (var j = 0; j < getIsScrapedResult.length; j++) {
-				if (archiveIdx != getIsScrapedResult[j].archive_idx) {
-					archive.scrap = false;
-				} else {
+
+			if (getIsScrapedResult[0] == undefined) {
+				archive.scrap = false;
+			} else {
+				if(archiveIdx == getIsScrapedResult[0].archive_idx){
 					archive.scrap = true;
+				} else {
+					archive.scrap = false;
 				}
 			}
 		}

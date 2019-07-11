@@ -127,14 +127,14 @@ router.post('/add/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const deleteAddArchiveQuery = 'DELETE FROM archiveAdd WHERE user_idx = ? AND archive_idx = ?'
 
 	const getAddArchiveResult = await db.queryParam_Parse(getAddArchiveQuery, [userIdx, archiveIdx]);
-	if (getAddArchiveResult.length == 0) {
+	if (getAddArchiveResult.length == 0) { //스크랩 실행
 		const insertAddArchiveResult = await db.queryParam_Arr(insertAddArchiveQuery, [userIdx, archiveIdx]);
 		if (!insertAddArchiveResult) {
 			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.INSERT_ADD_ARCHIVE_FAIL));
 		} else {
 			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.INSERT_ADD_ARCHIVE_SUCCESS, insertAddArchiveResult));
 		}
-	} else {
+	} else { //이미 되어 있으면 테이블에서 지움
 		const deleteAddArchiveResult = await db.queryParam_Arr(deleteAddArchiveQuery, [userIdx, archiveIdx]);
 		if (!deleteAddArchiveResult) {
 			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.DELETE_ARCHIVE_FAIL));
