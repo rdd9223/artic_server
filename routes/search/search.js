@@ -37,7 +37,7 @@ router.get('/archive', authUtils.isLoggedin, async (req, res) => {
             // 스크랩 유무 체크
             const scrapCheckResult = await db.queryParam_Arr(getScrapCheckQuery, [userIdx, archiveIdx]);
             if(scrapCheckResult === undefined) {
-                res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ARCHIVE_SCRAP_CHECK_FAIL));
+                res.status(200).send(utils.successFalse(statusCode.BAD_REQUEsST, resMessage.ARCHIVE_SCRAP_CHECK_FAIL));
             } else {
                 if(scrapCheckResult.length == 0) {
                     archive.scrap = false;
@@ -95,7 +95,7 @@ router.get('/article', authUtils.isLoggedin, async (req, res) => {
 
 // 추천 검색어
 router.get('/recommendation', authUtils.isLoggedin, async (req, res) => {
-    const getSearchWordQuery = 'SELECT search_word FROM artic.search WHERE search_idx IN (?,?,?,?,?,?,?,?,?)';
+    const getSearchWordQuery = 'SELECT search_word FROM artic.search WHERE search_idx IN (1,2,3,4)';
     const randomArr = Rand(9, 10);
     console.log(randomArr);
     const getSearchWordResult = await db.queryParam_Arr(getSearchWordQuery, randomArr);
