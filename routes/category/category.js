@@ -29,7 +29,7 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 	const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx';
 	const getIsScrapedQuery = 'SELECT aa.archive_idx FROM archiveAdd aa, archiveCategory ac WHERE ac.category_idx = ? AND aa.user_idx = ?';
 
-	 console.log(getNewArchiveResult);
+	console.log(getNewArchiveResult);
 	if (!getNewArchiveResult) {
 		res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ARCHIVE_LIST_FAIL));
 	} else {

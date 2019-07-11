@@ -5,9 +5,10 @@ require('moment-timezone');
 moment.tz.setDefault("Asia/Seoul");
 
 const notificationSchema = new mongoose.Schema({
+	notification_type: { type: String, required: true},
+	date: { type: Date, default : Date.now},
     user_idx: { type: Array, required: true},
-    article_idx: { type: Array, required: true},
-    notification_type: { type: String, required: true}
+    article_idx: { type: Array, required: true}
 }, {
     versionKey: false
 });
@@ -27,7 +28,7 @@ notificationSchema.statics.updateFlag = function(user_idx){
 // user_idx,
 // 'article_idx' : article_idx,
 // 'notification_type' : notification_type
-notificationSchema.pre('save', function() { 
+notificationSchema.pre('create', function() { 
     if (!this.date) this.date = moment().format('YYYY-MM-DD HH:mm:ss');
 });
 
