@@ -191,19 +191,15 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 				// 새 아티클 알림
 				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
 				const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
-
+				
 				for (let i = 0, userData; userData = getAddArchiveUserResult[i]; i++) {
-					userData.isRead = false;	
+					userData.isRead = false;
 				}
 				
 				result = await Notification.create({
 					user_idx: getAddArchiveUserResult,
 					article_idx: articleIdx,
 					notification_type: 0
-				// }).then((result) => {
-				// 	res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, result));
-				// }).catch((err) => {
-				// 	res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
 				});
 			});
 

@@ -29,7 +29,7 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 	const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx';
 	const getIsScrapedQuery = 'SELECT aa.archive_idx FROM archiveAdd aa, archiveCategory ac WHERE ac.category_idx = ? AND aa.user_idx = ?';
 
-	 console.log(getNewArchiveResult);
+	console.log(getNewArchiveResult);
 	if (!getNewArchiveResult) {
 		res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ARCHIVE_LIST_FAIL));
 	} else {
@@ -43,7 +43,7 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 				const archiveCategoryResult = await db.queryParam_Arr(getArchiveCategoryQuery, [archiveIdx]) // 스트레스 ,, 
 				archive.category_all = archiveCategoryResult
 				const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [req.params.category_idx, userIdx]);
-				archive.archive_title = getNewArchiveResult[0].archive_title;
+				archive.archive_title = getNewArchiveResult[i].archive_title;
 				
 				for (var j = 0; j < getIsScrapedResult.length; j++) {
 					if (archiveIdx != getIsScrapedResult[j].archive_idx) {

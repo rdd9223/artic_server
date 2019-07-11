@@ -118,8 +118,6 @@ router.post('/1', authUtils.isLoggedin, async (req, res) => {
 				user_idx: userResult[j],
 				isRead: false
 			}
-			console.log(userData);
-			console.log(articleArr);
 
 			Notification.create({
 				user_idx: userData,
@@ -159,8 +157,6 @@ router.post('/2', authUtils.isLoggedin, async (req, res) => {
 				articleResult[j++] = getNotReadArticleIdxResult;
 			}
 		}
-		console.log(userResult);
-		console.log(articleResult);
 		let articleArr = [];
 		for (let i = 0; i < userResult.length; i++) {
 			for (let j = 0; j < articleResult[i].length; j++) {
