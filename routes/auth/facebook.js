@@ -18,9 +18,9 @@ router.post('/', async (req, res) => {
     const searchId = 'SELECT * FROM artic.user WHERE salt = ?'
     const searchIdResult = await db.queryParam_Arr(searchId, [id]);
 
-    console.log(searchIdResult)
+    console.log(searchIdResult[0])
     
-    if (!searchIdResult) {
+    if (searchIdResult[0] == undefined) {
         //신규 유저라면
         const insertFacebook = 'INSERT INTO artic.user (user_id, user_img, user_type, user_name, salt) VALUES (?, ?, ?, ?, ?)';
         const insertFacebookResult = await db.queryParam_Parse(insertFacebook, [email, img, type, name, id]);
