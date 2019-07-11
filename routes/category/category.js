@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 	}
 })
 
-//아카이브 목록 조회 다시다시
+//아카이브 목록 조회 
 router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => {
 
 	const userIdx = req.decoded.idx;
@@ -44,14 +44,14 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 				archive.category_all = archiveCategoryResult
 				const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [req.params.category_idx, userIdx]);
 				archive.archive_title = getNewArchiveResult[i].archive_title;
-				
-				for (var j = 0; j < getIsScrapedResult.length; j++) {
-					if (archiveIdx != getIsScrapedResult[j].archive_idx) {
+				//숨니 수정
+				//for (var j = 0; j < getIsScrapedResult.length; j++) {
+					if (archiveIdx != getIsScrapedResult[i].archive_idx) {
 						archive.scrap = false;
 					} else {
 						archive.scrap = true;
 					}
-				}
+				//}
 			}
 		}
 		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ARCHIVE_LIST_SUCCESS, getNewArchiveResult));
