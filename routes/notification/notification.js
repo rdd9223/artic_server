@@ -18,9 +18,8 @@ const Notification = require('../../models/notificationSchema'); //코드에 쓸
 
 // 모든 알림 불러오기
 router.get('/', authUtils.isLoggedin, async (req, res) => {
-	const userIdx = req.decoded.idx;
+	const userIdx = 7//req.decoded.idx;
 	//오름차순 = 1, 내림차순 = -1
-
 	Notification.find({
 			'user_idx.user_idx': userIdx
 		}).sort({
@@ -31,25 +30,11 @@ router.get('/', authUtils.isLoggedin, async (req, res) => {
 				res.status(statusCode.OK).send(utils.successFalse(statusCode.NO_CONTENT, resMessage.NOTIFICATION_NOT_EXIST));
 			} else {
 				const resResult = result;
-				Notification.updateMany({
-						"user_idx.user_idx": userIdx
-					}, {
-						$set: {
-							"user_idx.$.isRead": true
-						}
-					}, {
-						"multi": true
-					},
-					(err, updateResult) => {
-						if (err) {
-							console.log(err);
-						} else {
-							console.log(updateResult)
-						}
-					});
-				var resArr = Array();
+				var resArr = Array(); // 결과 배열
 				for (var i = 0; i < resResult.length; i++) {
 					var data = new Object();
+
+					const selectAchiveinfoQuery = 'SELECT ac.archive_title, ac.archive_idx FROM archiveArticle aa, archive ac WHERE aa.article_idx = ? AND aa.archive_idx = ac.archive_idx'
 					var selectArticleQuery = "SELECT * FROM article WHERE article_idx IN (";
 
 					for (var j = 0; articleIdx = resResult[i].article_idx, j < articleIdx.length; j++) {
@@ -61,12 +46,21 @@ router.get('/', authUtils.isLoggedin, async (req, res) => {
 					}
 					selectArticleQuery = selectArticleQuery + ")";
 					var articlesResult = await db.queryParam_None(selectArticleQuery);
-					data.articles = articlesResult
+					for(var j = 0; j < articlesResult.length; j++){
+						var selectAchiveinfoResult = await db.queryParam_Arr(selectAchiveinfoQuery,[articlesResult[j].article_idx]);
+						articlesResult[j].archive_idx = selectAchiveinfoResult[0].archive_idx;
+						articlesResult[j].archive_title = selectAchiveinfoResult[0].archive_title;
+					}
+					console.log(articlesResult);
+					data.articles = articlesResult;
+
+					var articleIdx = resResult[i].article_idx
 
 					for (var k = 0; userIdxes = resResult[i].user_idx, k < userIdxes.length; k++) {
 						if (userIdxes[k].user_idx == userIdx) {
 							data.isRead = userIdxes[k].isRead;
-							data.notification_type = resResult[k].notification_type
+							data.notification_type = resResult[k].notification_type;
+							data.notification_id = resResult[k]._id;
 							break;
 						}
 					}
@@ -77,6 +71,22 @@ router.get('/', authUtils.isLoggedin, async (req, res) => {
 			}
 		}).catch((err) => {
 			res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.NOTIFICATION_READ_FAIL));
+		});
+})
+// 읽음 변경 통신
+router.put('/read', authUtils.isLoggedin, async (req, res) => {
+	const userIdx = 7//req.decoded.idx;
+	Notification.updateMany({
+		"user_idx.user_idx": userIdx
+	}, {
+		$set: { "user_idx.$.isRead": true }
+		}, { "multi": true },
+		(err, updateResult) => {
+			if (err) {
+				res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ISREAD_UPDATE_FAIL));
+			} else {
+				res.status(statusCode.OK).send(utils.successTrue(statusCode.OK, resMessage.ISREAD_UPDATE_SUCCESS, updateResult));
+			}
 		});
 })
 
