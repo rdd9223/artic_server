@@ -10,7 +10,7 @@ const upload = require('../../config/multer');
 // 신규 아카이브 더보기 (최신순 정렬)
 router.get('/archives/new', authUtils.isLoggedin, async (req, res) => {
 	const userIdx = req.decoded.idx;
-	const getNewArchiveQuery = 'SELECT ar.*  FROM archive ar INNER JOIN category ca where ar.category_idx = ca.category_idx ORDER BY date DESC';
+	const getNewArchiveQuery = 'SELECT ar.*  FROM archive ar INNER JOIN category ca WHERE ar.category_idx = ca.category_idx AND ar.user_idx = 1 ORDER BY date DESC';
 	const getNewArchiveResult = await db.queryParam_None(getNewArchiveQuery);
 	const getNewArticleCount = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ? '; //해당 아카이브에 들어있는 아티클개수
 	// ++
