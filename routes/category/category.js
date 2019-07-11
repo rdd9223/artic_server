@@ -43,10 +43,11 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 				const archiveCategoryResult = await db.queryParam_Arr(getArchiveCategoryQuery, [archiveIdx]) // 스트레스 ,, 
 				archive.category_all = archiveCategoryResult
 				const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [req.params.category_idx, userIdx]);
+				console.log(`이눔쉐키들${getIsScrapedResult}`)
 				archive.archive_title = getNewArchiveResult[i].archive_title;
 				//숨니 수정
 				//for (var j = 0; j < getIsScrapedResult.length; j++) {
-					if (archiveIdx != getIsScrapedResult[i].archive_idx) {
+					if (archiveIdx != getIsScrapedResult[i]) {
 						archive.scrap = false;
 					} else {
 						archive.scrap = true;
