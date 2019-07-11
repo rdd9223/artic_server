@@ -61,6 +61,7 @@ router.get('/', authUtils.isLoggedin, async (req, res) => {
 							data.isRead = userIdxes[k].isRead;
 							data.notification_type = resResult[k].notification_type;
 							data.notification_id = resResult[k]._id;
+							data.notification_date = resResult[k].date;
 							break;
 						}
 					}
