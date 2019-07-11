@@ -264,7 +264,6 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
 
     const selectArchiveResult = await db.queryParam_Arr(selectArchiveQuery, [archiveIdx, userIdx]);
 
-    
     if (selectArchiveResult === undefined) {
         // 아카이브를 찾을 수 없음
         res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
@@ -273,10 +272,11 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
         res.status(202).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_ARCHIVE_OWNER));
     } else {
         const selectAddCheckResult = await db.queryParam_Arr(selectAddCheckQuery, [archiveIdx, articleIdx]); 
+        console.log(selectAddCheckResult)
         // 이미 담음
-        if (selectAddCheckResult > 0) {
+        if (selectAddCheckResult.length > 0) {
             res.status(202).send(utils.successTrue(statusCode.OK, resMessage.ARLEADY_SCRAP_ARTICLE));
-        } else if (selectAddCheckResult == 0) {
+        } else if (selectAddCheckResult.length == 0) {
             const insertArticleResult = await db.queryParam_Arr(insertArticleQuery, [articleIdx, archiveIdx]);
             if (insertArticleResult === undefined) {
                 res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.SCRAP_ARTICLE_FAIL));
