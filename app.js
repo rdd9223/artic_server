@@ -15,6 +15,10 @@ var app = express();
 var mongoose = require('./config/mongoose');
 mongoose();
 
+//helmet
+const helmet = require('helmet');
+app.use(helmet());
+app.disable('x-powered-by');
 
 //passport setup
 app.use(session({ secret: '비밀코드', resave: true, saveUninitialized: false })); // 세션 활성화
