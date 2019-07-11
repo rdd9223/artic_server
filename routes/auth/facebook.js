@@ -14,18 +14,35 @@ router.post('/', async (req, res) => {
     const name = req.body.name; // user_name
     const img = req.body.img
     const type = "facebookuser"
+    //salt값에 저장된 페이스북 고유 id로 회원 아이디 찾기
+    const searchId = 'SELECT * FROM artic.user WHERE salt = ?'
+    const searchIdResult = await db.queryParam_Arr(searchId, [id]);
 
-    const insertFacebook = 'INSERT INTO artic.user (user_id, user_img, user_type, user_name, salt) VALUES (?, ?, ?, ?, ?)';
-    const insertFacebookResult = await db.queryParam_Parse(insertFacebook, [email, img, type, name, id]);
-    if(!insertFacebookResult) {
-        res.status(200).send(utils.successFalse(statusCode.INTERNAL_SERVER_ERROR, resMessage.LOGIN_FAIL));
+    console.log(searchIdResult)
+    
+    if (!searchIdResult) {
+        //신규 유저라면
+        const insertFacebook = 'INSERT INTO artic.user (user_id, user_img, user_type, user_name, salt) VALUES (?, ?, ?, ?, ?)';
+        const insertFacebookResult = await db.queryParam_Parse(insertFacebook, [email, img, type, name, id]);
+        if (!insertFacebookResult) {
+            res.status(200).send(utils.successFalse(statusCode.INTERNAL_SERVER_ERROR, resMessage.LOGIN_FAIL));
+        } else {
+            //토큰화
+            const tokenValue = jwt.sign(insertFacebookResult.insertId);
+            console.log(tokenValue);
+            res.status(200).send(utils.successTrue(statusCode.AUTH_OK, resMessage.LOGIN_SUCCESS, tokenValue.token));
+        }
+        
     } else {
-        //토큰화
-        const tokenValue = jwt.sign(insertFacebookResult.insertId);
-        console.log(tokenValue);
-        res.status(200).send(utils.successTrue(statusCode.AUTH_OK, resMessage.LOGIN_SUCCESS, tokenValue));
+        //이미 회원이라면
+        if (id == searchIdResult[0].salt) {
+            console.log(searchIdResult[0].salt)
+            const tokenValue = jwt.sign(searchIdResult[0].user_idx);
+            console.log(tokenValue.token)
+            res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ALREADY_USER, tokenValue.token));
+        }
+        
     }
-
 });
 
 module.exports = router;

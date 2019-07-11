@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 	}
 })
 
-//아카이브 목록 조회
+//아카이브 목록 조회 다시다시
 router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => {
 
 	const userIdx = req.decoded.idx;
