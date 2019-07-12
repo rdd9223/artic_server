@@ -14,10 +14,6 @@ var moment = require('moment');
 const crawlingoption = require('../../modules/crawling/crawlingoption')
 require('moment-timezone');
 
-
-
-
-
 //아카이브 등록
 // 관리자 아카이브 등록시 - title, img, category_main, category_sub
 // 사용자 아카이브 등록시 - title, category_main
@@ -193,19 +189,17 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 				console.log(selectArticleIdxResult[0].article_idx);
 				const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)'; //아카이브아티클
 				const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
-				// 새 아티클 알림
-				//const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
-				//const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
-
-				// for (let i = 0, userData; userData = getAddArchiveUserResult[i]; i++) {
-				// 	userData.isRead = false;
-				// }
-
-				// result = await Notification.create({
-				// 	user_idx: getAddArchiveUserResult,
-				// 	article_idx: articleIdx,
-				// 	notification_type: 0
-				// });
+				//새 아티클 알림
+				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
+				const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
+				for (let i = 0, userData; userData = getAddArchiveUserResult[i]; i++) {
+					userData.isRead = false;
+				}
+				result = await Notification.createWithDate({
+					user_idx: getAddArchiveUserResult,
+					article_idx: articleIdx,
+					notification_type: 0
+				});
 			});
 
 			if (insertTransaction === undefined) {
@@ -331,8 +325,4 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
 
 	}
 });
-
-
-
-
 module.exports = router;
