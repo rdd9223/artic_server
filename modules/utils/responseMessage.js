@@ -56,6 +56,7 @@ module.exports =  {
     SCRAP_ARTICLE_FAIL: "아티클 담기 실패",
     ALREADY_SCRAP_ARTICLE: "아티클이 이미 담겨있음",
     NOT_ARCHIVE_OWNER: "아카이브 소유자가 아님",
+    MY_ARCHIVE_IMG :"내 아카이브에 첫번째 이미지 등록",
     LIKE_ARTICLE_FAIL: "아티클 좋아요 실패",
     LIKE_ARTICLE_SUCCESS: "아티클 좋아요 성공",
     UNLIKE_ARTICLE_FAIL: "아티클 좋아요 취소 실패",
