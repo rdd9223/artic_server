@@ -93,7 +93,6 @@ router.put('/read', authUtils.isLoggedin, async (req, res) => {
 
 // 추천 알림 (마지막 읽은 아티클의 카테고리 중, 무작위 5개(안 읽은 것))
 router.post('/1', authUtils.isLoggedin, async (req, res) => {
-	console.log(req.decoded.idx);
 	if (req.decoded.idx == 1) {
 		const getAllUserIdxQuery = 'SELECT user_idx FROM user WHERE user_idx != ?'
 		const getRecentViewArticleQuery = 'SELECT article_idx FROM `read` WHERE user_idx = ? ORDER BY date DESC LIMIT 1';
@@ -106,16 +105,12 @@ router.post('/1', authUtils.isLoggedin, async (req, res) => {
 		var articleResult = [],
 			userResult = [];
 		for (let i = 0, j = 0; i < getAllUserIdxResult.length; i++) {
-			//console.log(getAllUserIdxResult[i].user_idx);
 			const getRecentViewArticleResult = await db.queryParam_Arr(getRecentViewArticleQuery, [getAllUserIdxResult[i].user_idx]);
 			if (getRecentViewArticleResult.length != 0) {
-				//console.log(getRecentViewArticleResult[0].article_idx);
 				const getCategoryFromArticleResult = await db.queryParam_Arr(getCategoryFromArticleQuery, [getRecentViewArticleResult[0].article_idx]);
-				//console.log(getCategoryFromArticleResult[0].category_idx);
 				const getRandomRecommendArticleResult = await db.queryParam_Arr(getRandomRecommendArticleQuery, [getCategoryFromArticleResult[0].category_idx, getAllUserIdxResult[i].user_idx]);
 				userResult[j] = getAllUserIdxResult[i].user_idx;
 				articleResult[j++] = getRandomRecommendArticleResult;
-				//console.log(articleResult[j-1]);
 			}
 		}
 
@@ -163,8 +158,6 @@ router.post('/2', authUtils.isLoggedin, async (req, res) => {
 		for (let i = 0, j = 0; i < getAllUserIdxResult.length; i++) {
 			const getNotReadArticleIdxResult = await db.queryParam_Arr(getNotReadArticleIdxQuery, [getAllUserIdxResult[i].user_idx, getAllUserIdxResult[i].user_idx]);
 			if (getNotReadArticleIdxResult.length != 0) {
-				// console.log(getAllUserIdxResult[i]);
-				// console.log(getNotReadArticleIdxResult);
 				userResult[j] = getAllUserIdxResult[i].user_idx;
 				articleResult[j++] = getNotReadArticleIdxResult;
 			}
