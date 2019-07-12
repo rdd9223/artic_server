@@ -27,8 +27,8 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 	const getNewArchiveResult = await db.queryParam_Arr(getNewArchiveQuery, [category_idx, category_idx]);
 	const getNewArticleCount = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ? '; //해당 아카이브에 들어있는 아티클개수
 	const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx';
-	const getIsScrapedQuery = 'SELECT aa.archive_idx FROM archiveAdd aa, archiveCategory ac WHERE aa.archive_idx = ac.archive_idx AND ac.category_idx = ? AND aa.user_idx = ?';
-
+	const getIsScrapedQuery = 'SELECT aa.archive_idx FROM archiveAdd aa, archiveCategory ac WHERE aa.archive_idx = ac.archive_idx AND ac.archive_idx = ? AND aa.user_idx = ?';
+	//한 아카이브에서 스크랩이 2개 되었을 때 처리를 안해w
 	console.log(getNewArchiveResult);
 	if (!getNewArchiveResult) {
 		res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ARCHIVE_LIST_FAIL));
@@ -42,7 +42,7 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 				archive.article_cnt = archiveCount[0].count
 				const archiveCategoryResult = await db.queryParam_Arr(getArchiveCategoryQuery, [archiveIdx]) // 스트레스 ,, 
 				archive.category_all = archiveCategoryResult
-				const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [req.params.category_idx, userIdx]);
+				const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [archiveIdx, userIdx]);
 				archive.archive_title = getNewArchiveResult[i].archive_title;
 			if (getIsScrapedResult[0] == undefined) {
 				archive.scrap = false;
