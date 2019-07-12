@@ -15,3 +15,5 @@
 ## Architecture
 ![Architecture](https://github.com/artic-development/artic_server/blob/master/images/architecture.png)
 
+## Work Flow
+!
