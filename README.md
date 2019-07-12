@@ -1,4 +1,4 @@
-# Concertrip_Server
+# ARTIC
 #### 당신이 찾는 모든 지식 콘텐츠, 아틱(artic)
 
 ![앱아이콘](https://github.com/artic-development/artic_server/blob/master/images/logo.png)
