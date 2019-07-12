@@ -3,8 +3,12 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import sys
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
 
-# url입력 (나중엔 받아와야해)
+# 403에러시 헤더처리 하기
+#headers = {'User-Agent': 'Mozilla/5.0'}   , headers=headers
 res = requests.get(sys.argv[1])
 link = sys.argv[1]
 soup = BeautifulSoup(res.content, 'html.parser')
@@ -13,7 +17,7 @@ thumnail = soup.find('meta', {'property': 'og:image'})
 try:
     output = thumnail['content']
 except TypeError:
-    output = "https://hyeongbucket.s3.ap-northeast-2.amazonaws.com/kwon.jpg"
+    output = "https://hyeongbucket.s3.ap-northeast-2.amazonaws.com/artic/articledefault.png"
 
 # YYYY/mm/dd HH:MM:SS 형태의 시간 출력
 date = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
