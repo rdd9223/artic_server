@@ -196,7 +196,7 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 					userData.isRead = false;
 				}
 
-				result = await Notification.create({
+				result = await Notification.createWithDate({
 					user_idx: getAddArchiveUserResult,
 					article_idx: articleIdx,
 					notification_type: 0

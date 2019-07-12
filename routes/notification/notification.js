@@ -51,26 +51,24 @@ router.get('/', authUtils.isLoggedin, async (req, res) => {
 						articlesResult[j].archive_idx = selectAchiveinfoResult[0].archive_idx;
 						articlesResult[j].archive_title = selectAchiveinfoResult[0].archive_title;
 					}
-					console.log(articlesResult);
 					data.articles = articlesResult;
 
-					var articleIdx = resResult[i].article_idx
-
-					for (var k = 0; userIdxes = resResult[i].user_idx, k < userIdxes.length; k++) {
+					for (var k = 0, userIdxes = resResult[i].user_idx; k < userIdxes.length; k++) {
 						if (userIdxes[k].user_idx == userIdx) {
 							data.isRead = userIdxes[k].isRead;
-							data.notification_type = resResult[k].notification_type;
-							data.notification_id = resResult[k]._id;
-							data.notification_date = resResult[k].date;
 							break;
 						}
 					}
+					data.notification_type = resResult[i].notification_type;
+					data.notification_id = resResult[i]._id;
+					data.notification_date = resResult[i].date;
 
 					resArr[i] = data;
 				}
 				res.status(statusCode.OK).send(utils.successTrue(statusCode.OK, resMessage.NOTIFICATION_READ_SUCCESS, resArr));
 			}
 		}).catch((err) => {
+			console.log(err)
 			res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.NOTIFICATION_READ_FAIL));
 		});
 })
@@ -124,9 +122,9 @@ router.post('/1', authUtils.isLoggedin, async (req, res) => {
 			userData = {
 				user_idx: userResult[j],
 				isRead: false
-			}
+			};
 
-			Notification.create({
+			Notification.createWithDate({
 				user_idx: userData,
 				article_idx: articleArr,
 				notification_type: 1
@@ -157,6 +155,8 @@ router.post('/2', authUtils.isLoggedin, async (req, res) => {
 			articleResult = [];
 		for (let i = 0, j = 0; i < getAllUserIdxResult.length; i++) {
 			const getNotReadArticleIdxResult = await db.queryParam_Arr(getNotReadArticleIdxQuery, [getAllUserIdxResult[i].user_idx, getAllUserIdxResult[i].user_idx]);
+			
+			console.log(getNotReadArticleIdxResult)
 			if (getNotReadArticleIdxResult.length != 0) {
 				userResult[j] = getAllUserIdxResult[i].user_idx;
 				articleResult[j++] = getNotReadArticleIdxResult;
@@ -171,14 +171,13 @@ router.post('/2', authUtils.isLoggedin, async (req, res) => {
 				user_idx: userResult[i],
 				isRead: false
 			}
-			Notification.create({
+			Notification.createWithDate({
 				user_idx: userData,
 				article_idx: articleArr,
 				notification_type: 2
 			}).then((result) => {
-				resultArr[i] = {
-					result
-				};
+				console.log(result);
+				resultArr[i] = result;
 			});
 		}
 		if (!resultArr) {
