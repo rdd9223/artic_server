@@ -27,7 +27,7 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 	const getNewArchiveResult = await db.queryParam_Arr(getNewArchiveQuery, [category_idx, category_idx]);
 	const getNewArticleCount = 'SELECT count(article_idx) count FROM archiveArticle WHERE archive_idx = ? '; //해당 아카이브에 들어있는 아티클개수
 	const getArchiveCategoryQuery = 'SELECT ca.category_title FROM category ca INNER JOIN archiveCategory ac WHERE ac.archive_idx = ? AND ac.category_idx = ca.category_idx';
-	const getIsScrapedQuery = 'SELECT aa.archive_idx FROM archiveAdd aa, archiveCategory ac WHERE ac.category_idx = ? AND aa.user_idx = ?';
+	const getIsScrapedQuery = 'SELECT aa.archive_idx FROM archiveAdd aa, archiveCategory ac WHERE aa.archive_idx = ac.archive_idx AND ac.category_idx = ? AND aa.user_idx = ?';
 
 	console.log(getNewArchiveResult);
 	if (!getNewArchiveResult) {
@@ -44,17 +44,15 @@ router.get('/:category_idx/archives', authUtils.isLoggedin, async (req, res) => 
 				archive.category_all = archiveCategoryResult
 				const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [req.params.category_idx, userIdx]);
 				archive.archive_title = getNewArchiveResult[i].archive_title;
-				console.log(getIsScrapedResult[0]);
-
-				if (getIsScrapedResult[0] == undefined) {
-					archive.scrap = false;
+			if (getIsScrapedResult[0] == undefined) {
+				archive.scrap = false;
+			} else {
+				if(archiveIdx == getIsScrapedResult[0].archive_idx){
+					archive.scrap = true;
 				} else {
-					if(archiveIdx == getIsScrapedResult[0].archive_idx){
-						archive.scrap = true;
-					} else {
-						archive.scrap = false;
-					}
+					archive.scrap = false;
 				}
+			}
 					
 			}
 		}
