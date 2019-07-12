@@ -260,7 +260,7 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
     const userIdx = req.decoded.idx;
     const selectArchiveQuery = 'SELECT * FROM archive WHERE archive_idx = ? AND user_idx = ?';
     const selectAddCheckQuery = 'SELECT * FROM archiveArticle WHERE archive_idx = ? AND article_idx = ?';
-    const insertArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)';
+	const insertArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)';
 
     const selectArchiveResult = await db.queryParam_Arr(selectArchiveQuery, [archiveIdx, userIdx]);
 
@@ -275,7 +275,19 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
         console.log(selectAddCheckResult)
         // 이미 담음
         if (selectAddCheckResult.length > 0) {
-            res.status(202).send(utils.successTrue(statusCode.OK, resMessage.ARLEADY_SCRAP_ARTICLE));
+			const selectArchiveCnt = 'SELECT * FROM archiveArticle WHERE archive_idx = ?'
+			const selectArchiveCntResult = await db.queryParam_Arr(selectArchiveCnt,[archiveIdx])
+			if (selectArchiveCntResult.length == 1) { //첫번째 아티클의 이미지를 아카이브 사진으로 update
+				//첫번째 아티클의 이미지 가져오기
+				const getImg = 'SELECT thumnail FROM artic.article WHERE article_idx =?'
+				const getImgResult = await db.queryParam_Arr(getImg, [selectAddCheckResult[0].article_idx])
+				const updateArchive = 'UPDATE artic.archive SET archive_img = ? WHERE archive_idx = ?'
+				const updateArchiveResult = await db.queryParam_Arr(updateArchive,[getImgResult[0].thumnail, archiveIdx])
+				res.status(202).send(utils.successTrue(statusCode.OK, resMessage.MY_ARCHIVE_IMG));
+			} else {
+				res.status(202).send(utils.successTrue(statusCode.OK, resMessage.ALREADY_SCRAP_ARTICLE));
+			}
+            
         } else if (selectAddCheckResult.length == 0) {
             const insertArticleResult = await db.queryParam_Arr(insertArticleQuery, [articleIdx, archiveIdx]);
             if (insertArticleResult === undefined) {
@@ -283,7 +295,7 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
             } else {
                 res.status(200).send(utils.successTrue(statusCode.OK, resMessage.SCRAP_ARTICLE_SUCCESS));
             }
-        }
+		} 
     }
 });
 
