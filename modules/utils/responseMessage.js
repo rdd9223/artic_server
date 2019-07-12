@@ -108,6 +108,10 @@ module.exports =  {
 	NOTIFICATION_NOT_EXIST: "알림이 존재하지 않음",
 	NOTIFICATION_POST_SUCCESS: "알림 저장 성공",
 	NOTIFICATION_POST_FAIL: "알림 저장 실패",
-	NO_ARTIC_MANAGER: "관리자가 아닙니다"
+    NO_ARTIC_MANAGER: "관리자가 아닙니다",
+    
+    ARCHIVE_SCRAP_SUCCESS : "아카이브 별 스크랩 여부 조회 성공",
+    ARCHIVE_SCRAP_FAIL : "아카이브 별 스크랩 여부 조회 실패",
+    ARCHIVE_SCRAP_NO : "아카이브 별 스크랩 없음"
 
 }

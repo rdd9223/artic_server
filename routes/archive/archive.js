@@ -14,6 +14,10 @@ var moment = require('moment');
 const crawlingoption = require('../../modules/crawling/crawlingoption')
 require('moment-timezone');
 
+
+
+
+
 //아카이브 등록
 // 관리자 아카이브 등록시 - title, img, category_main, category_sub
 // 사용자 아카이브 등록시 - title, category_main
@@ -211,6 +215,37 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 		}
 	}
 });
+//아카이브 아이디로 스크랩 여부
+router.get('/:archive_idx/scrap', authUtils.isLoggedin, async (req, res) => {
+	const archiveIdx = req.params.archive_idx;
+	const userIdx = req.decoded.idx;
+
+	const getIsScrapedQuery = 'SELECT archive_idx FROM archiveAdd WHERE archive_idx = ? AND user_idx = ?';
+	const getIsScrapedResult = await db.queryParam_Arr(getIsScrapedQuery, [archiveIdx, userIdx]);
+
+	if (!getIsScrapedResult) {
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ARCHIVE_SCRAP_FAIL));
+	} else {
+		if (getIsScrapedResult.length == 0) {
+			res.status(200).send(utils.successTrue(statusCode.NO_CONTENT, resMessage.ARCHIVE_SCRAP_NO, {"scrap" : false}));
+		} else {
+			for (var i = 0, archive; archive = getIsScrapedResult[i]; i++) {
+				const archiveIdx = archive.archive_idx;
+				if (getIsScrapedResult[0] == undefined) {
+					archive.scrap = false;
+				} else {
+					if (archiveIdx == getIsScrapedResult[0].archive_idx) {
+						archive.scrap = true;
+					} else {
+						archive.scrap = false;
+					}
+				}
+			}
+			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ARCHIVE_SCRAP_SUCCESS, getIsScrapedResult[0]));
+		}
+		
+	}
+});
 
 // 아티클 목록 (신규 순)
 router.get('/:archive_idx/articles', authUtils.isLoggedin, async (req, res) => {
@@ -295,6 +330,8 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
 
 	}
 });
+
+
 
 
 module.exports = router;
