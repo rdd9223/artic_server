@@ -86,7 +86,7 @@ router.get('/history', authUtils.isLoggedin, async (req, res) => {
 
 //아틱의 추천 
 router.get('/pick', async (req, res) => {
-	const getArticlePickQuery = 'SELECT * FROM artic.article WHERE pick = 0';
+	const getArticlePickQuery = 'SELECT * FROM artic.article WHERE pick = 0 ORDER BY article_idx DESC';
 	const getArticlePickResult = await db.queryParam_None(getArticlePickQuery);
 
 	if (!getArticlePickResult) {

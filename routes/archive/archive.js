@@ -184,8 +184,9 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 					});
 				})
 			}
-			await python(url);
+			
 			const insertTransaction = await db.Transaction(async (connection) => {
+				await python(url);
 				const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
 				const selectArticleIdxResult = await connection.query(selectArticleIdx);
 				const articleIdx = selectArticleIdxResult[0].article_idx
@@ -193,18 +194,18 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 				const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)'; //아카이브아티클
 				const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
 				// 새 아티클 알림
-				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
-				const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
+				//const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
+				//const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
 
-				for (let i = 0, userData; userData = getAddArchiveUserResult[i]; i++) {
-					userData.isRead = false;
-				}
+				// for (let i = 0, userData; userData = getAddArchiveUserResult[i]; i++) {
+				// 	userData.isRead = false;
+				// }
 
-				result = await Notification.create({
-					user_idx: getAddArchiveUserResult,
-					article_idx: articleIdx,
-					notification_type: 0
-				});
+				// result = await Notification.create({
+				// 	user_idx: getAddArchiveUserResult,
+				// 	article_idx: articleIdx,
+				// 	notification_type: 0
+				// });
 			});
 
 			if (insertTransaction === undefined) {
