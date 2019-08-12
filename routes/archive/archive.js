@@ -99,22 +99,35 @@ router.put('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	}
 });
 //아카이브 삭제
-//관리자만 지울 수 있게
+//자기 아카이브만 지울 수 있도록 해야함
 router.delete('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const idx = req.params.archive_idx;
-	const user_idx = req.decoded.idx;
+	let user_idx = req.decoded.idx;
+	const getUserIdx = await db.queryParam_Arr('SELECT user_idx FROM archive WHERE user_idx = ?', [user_idx]);
 	const getArchiveCount = await db.queryParam_Arr('SELECT COUNT(*) count FROM archive WHERE user_idx = ?', [user_idx])
-	if (user_idx != 1) {
-		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
+	if (getUserIdx.length == 0) {
+		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.ARCHIVE_NO))
 	} else {
-		const deleteArchive = 'DELETE FROM archive WHERE archive_idx = ?';
-		const deleteArchiveResult = await db.queryParam_Arr(deleteArchive, [idx]);
-		if (deleteArchiveResult === undefined) {
-			res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.DELETE_ARCHIVE_FAIL));
-		} else {
+		if (user_idx != getUserIdx[0].user_idx) { //사용자가 같지 않을때
+			console.log("권한 틀릴때")
+			res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
+		} else if (user_idx = getUserIdx[0].user_idx) {
+			console.log("권한 맞을떄")
+			const deleteArchive = 'DELETE FROM archive WHERE archive_idx = ? AND user_idx = ?';
+			const deleteArchiveResult = await db.queryParam_Parse(deleteArchive, [idx, user_idx]);
 			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.DELETE_ARCHIVE_SUCCESS));
+		} else if (user_idx = 1) { //관리자는 다 삭제가능
+			console.log("관리자 삭제가능")
+			const deleteArchive = 'DELETE FROM archive WHERE archive_idx = ?';
+			const deleteArchiveResult = await db.queryParam_Arr(deleteArchive, [idx]);
+			if (deleteArchiveResult === undefined) {
+				res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.DELETE_ARCHIVE_FAIL));
+			} else {
+				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.DELETE_ARCHIVE_SUCCESS));
+			}
 		}
 	}
+
 });
 
 // 아카이브 스크랩
@@ -180,7 +193,7 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 					});
 				})
 			}
-			
+
 			const insertTransaction = await db.Transaction(async (connection) => {
 				await python(url);
 				const selectArticleIdx = 'SELECT article_idx FROM article ORDER BY article_idx DESC LIMIT 1';
@@ -222,7 +235,9 @@ router.get('/:archive_idx/scrap', authUtils.isLoggedin, async (req, res) => {
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ARCHIVE_SCRAP_FAIL));
 	} else {
 		if (getIsScrapedResult.length == 0) {
-			res.status(200).send(utils.successTrue(statusCode.NO_CONTENT, resMessage.ARCHIVE_SCRAP_NO, {"scrap" : false}));
+			res.status(200).send(utils.successTrue(statusCode.NO_CONTENT, resMessage.ARCHIVE_SCRAP_NO, {
+				"scrap": false
+			}));
 		} else {
 			for (var i = 0, archive; archive = getIsScrapedResult[i]; i++) {
 				const archiveIdx = archive.archive_idx;
@@ -238,7 +253,7 @@ router.get('/:archive_idx/scrap', authUtils.isLoggedin, async (req, res) => {
 			}
 			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ARCHIVE_SCRAP_SUCCESS, getIsScrapedResult[0]));
 		}
-		
+
 	}
 });
 
@@ -325,4 +340,7 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
 
 	}
 });
+
+//아티클 담기 취소
+// 본인 확인, 
 module.exports = router;
