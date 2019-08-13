@@ -14,14 +14,14 @@ router.post('/', async (req, res) => {
 
 	const selectQuery = 'SELECT * FROM user WHERE user_id = ? AND user_type = "user"';
 	const getAdmin = 'SELECT * FROM user WHERE user_id = ?'
-	const getAdminResult = await db.queryParam_Parse(getAdmin, [id]);
+	const getAdminResult = await db.queryParam_Arr(getAdmin, [id]);
 
 	if (!id || !pw) { //아이디가 없고 패스워드도 없음
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ID_OR_PW_NULL_VALUE));
 	} else {
 		console.log(getAdminResult[0].user_type)
 		if (getAdminResult[0].user_type == 'admin') { //관리자 로그인
-			const tokenValue = jwt.sign(getAdmin[0].user_idx);
+			const tokenValue = jwt.sign(getAdminResult[0].user_idx);
 			res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.LOGIN_SUCCESS, tokenValue));
 		} else { //회원 로그인
 			const selectResult = await db.queryParam_Parse(selectQuery, [id]);
