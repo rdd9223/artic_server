@@ -8,7 +8,8 @@ const notificationSchema = new mongoose.Schema({
 	notification_type: { type: String, required: true},
 	date: { type: Date },
     user_idx: { type: Array, required: true},
-    article_idx: { type: Array, required: true}
+	article_idx: { type: Array, required: true},
+	string_type: { type: Number , default: null}
 }, {
     versionKey: false
 });

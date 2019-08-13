@@ -6,6 +6,9 @@ const statusCode = require('../../modules/utils/statusCode');
 const utils = require('../../modules/utils/utils');
 const authUtils = require('../../modules/utils/authUtils');
 const Notification = require('../../models/notificationSchema'); //코드에 쓸 스키마 가져오기
+const cron = require('node-cron'); //스케쥴러
+const moment = require('moment');
+
 // mongoose promise지원
 
 /*	
@@ -13,12 +16,13 @@ const Notification = require('../../models/notificationSchema'); //코드에 쓸
 	newArticle = 0
 	recommend = 1
 	notRead = 2
+	firstNotification = 3
 */
 // newArticle code --> route/archive/:archive_idx/article
 
 // 모든 알림 불러오기
-router.get('/', authUtils.isLoggedin, async (req, res) => {
-	const userIdx = req.decoded.idx;
+router.get('/', /*authUtils.isLoggedin,*/ async (req, res) => {
+	const userIdx = 2//req.decoded.idx;
 	//오름차순 = 1, 내림차순 = -1
 	Notification.find({
 			'user_idx.user_idx': userIdx
@@ -29,39 +33,27 @@ router.get('/', authUtils.isLoggedin, async (req, res) => {
 			if (!result[0]) {
 				res.status(statusCode.OK).send(utils.successFalse(statusCode.NO_CONTENT, resMessage.NOTIFICATION_NOT_EXIST));
 			} else {
-				const resResult = result;
 				var resArr = Array(); // 결과 배열
-				for (var i = 0; i < resResult.length; i++) {
+				for (var i = 0; i < result.length; i++) {
 					var data = new Object();
+					var articles = result[i].article_idx;
+					var count = 0;
 
-					const selectAchiveinfoQuery = 'SELECT ac.archive_title, ac.archive_idx FROM archiveArticle aa, archive ac WHERE aa.article_idx = ? AND aa.archive_idx = ac.archive_idx'
-					var selectArticleQuery = "SELECT * FROM article WHERE article_idx IN (";
-
-					for (var j = 0; articleIdx = resResult[i].article_idx, j < articleIdx.length; j++) {
-						console.log(articleIdx[j])
-						selectArticleQuery = selectArticleQuery + String(articleIdx[j])
-						if (j != articleIdx.length - 1) {
-							selectArticleQuery = selectArticleQuery + ",";
-						}
-					}
-					selectArticleQuery = selectArticleQuery + ")";
-					var articlesResult = await db.queryParam_None(selectArticleQuery);
-					for(var j = 0; j < articlesResult.length; j++){
-						var selectAchiveinfoResult = await db.queryParam_Arr(selectAchiveinfoQuery,[articlesResult[j].article_idx]);
-						articlesResult[j].archive_idx = selectAchiveinfoResult[0].archive_idx;
-						articlesResult[j].archive_title = selectAchiveinfoResult[0].archive_title;
-					}
-					data.articles = articlesResult;
-
-					for (var k = 0, userIdxes = resResult[i].user_idx; k < userIdxes.length; k++) {
+					for (var k = 0, userIdxes = result[i].user_idx; k < userIdxes.length; k++) {
 						if (userIdxes[k].user_idx == userIdx) {
 							data.isRead = userIdxes[k].isRead;
 							break;
 						}
 					}
-					data.notification_type = resResult[i].notification_type;
-					data.notification_id = resResult[i]._id;
-					data.notification_date = resResult[i].date;
+					while(count<articles.length){
+						count++;
+					}
+					data.article_idx = result[i].article_idx;
+					data.article_count = count;
+					data.string_type = result[i].string_type;
+					data.notification_type = result[i].notification_type;
+					data.notification_id = result[i]._id;
+					data.notification_date = result[i].date;
 
 					resArr[i] = data;
 				}
@@ -74,13 +66,15 @@ router.get('/', authUtils.isLoggedin, async (req, res) => {
 })
 
 // 읽음 변경 통신
-router.put('/read', authUtils.isLoggedin, async (req, res) => {
-	const userIdx = req.decoded.idx;
+// header: _id(해당 알림 id값 주세용)
+router.put('/read', /*authUtils.isLoggedin,*/ async (req, res) => {
+	const userIdx = 2//req.decoded.idx;
 	Notification.updateMany({
-		"user_idx.user_idx": userIdx
+		"user_idx.user_idx": userIdx,
+		"_id": req.get('_id')
 	}, {
 		$set: { "user_idx.$.isRead": true }
-		}, { "multi": true },
+		}, {},
 		(err, updateResult) => {
 			if (err) {
 				res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ISREAD_UPDATE_FAIL));
@@ -191,5 +185,28 @@ router.post('/2', authUtils.isLoggedin, async (req, res) => {
 		res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.NO_ARTIC_MANAGER));
 	}
 });
+
+// 24시간 이내 생성된 아티클을 알림으로 저장
+cron.schedule('0 0 8 * * ?', () => {
+	const getNewArticleQuery = 'SELECT article_idx FROM article WHERE date >= ?';
+	const getNewArticleResult = await db.queryParam_Parse(getNewArticleQuery, [moment().subtract(1, 'd')]);
+
+	if(!getNewArticleResult[0]){
+		res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ARTICLE_ADD_NOTIFICATION_FAIL));
+	} else {
+		
+	}
+})
+
+// cron.schedule('0 0 8 * * ?', () => {
+//     console.log("1분마다 실행");
+//     console.log(moment().format('YYYY-MM-DD HH:mm:ss')) // moment() 꼭 괄호열고 괄호 닫아야함
+//     console.log(`신입생 OT 이후 ${moment().diff(moment('2019-03-23'),"days")}일 지남`);
+// });
+
+// cron.schedule('*/10 * * * *', () => {
+//     console.log('10분마다 실행');
+//     console.log(`30일 후 날짜 => ${moment().add(30,"days").format("YYYY년 MM월 D일")}`)
+// });
 
 module.exports = router;
