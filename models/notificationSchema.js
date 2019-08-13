@@ -6,7 +6,7 @@ moment.tz.setDefault("Asia/Seoul");
 
 const notificationSchema = new mongoose.Schema({
 	notification_type: { type: String, required: true},
-	date: { type: Date, default : Date.now},
+	date: { type: Date },
     user_idx: { type: Array, required: true},
     article_idx: { type: Array, required: true}
 }, {
@@ -23,6 +23,15 @@ notificationSchema.statics.findByUserIdx = function(user_idx) {
 notificationSchema.statics.updateFlag = function(user_idx){
 	return this.update({
 		'user_idx' : { "$elemMatch" : {'user_idx' : user_idx}}
+	})
+}
+
+notificationSchema.statics.createWithDate = function(user){
+	return this.create({
+		'user_idx': user.user_idx,
+		'article_idx': user.article_idx,
+		'notification_type': user.notification_type,
+		'date': moment().format('YYYY-MM-DD HH:mm:ss')
 	})
 }
 // user_idx,

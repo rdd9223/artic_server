@@ -54,8 +54,9 @@ module.exports =  {
     READ_ARTICLE_FAIL: "아티클 읽기 실패",
     SCRAP_ARTICLE_SUCCESS: "아티클 담기 성공",
     SCRAP_ARTICLE_FAIL: "아티클 담기 실패",
-    ARLEADY_SCRAP_ARTICLE: "아티클이 이미 담겨있음",
+    ALREADY_SCRAP_ARTICLE: "아티클이 이미 담겨있음",
     NOT_ARCHIVE_OWNER: "아카이브 소유자가 아님",
+    MY_ARCHIVE_IMG :"내 아카이브에 첫번째 이미지 등록",
     LIKE_ARTICLE_FAIL: "아티클 좋아요 실패",
     LIKE_ARTICLE_SUCCESS: "아티클 좋아요 성공",
     UNLIKE_ARTICLE_FAIL: "아티클 좋아요 취소 실패",
@@ -87,8 +88,8 @@ module.exports =  {
 	FIND_MY_ARCHIVE_SUCCESS: "내 아카이브 찾기 성공",
 	DELETE_ADD_ARCHIVE_FAIL: "아카이브 담기 취소 실패",
 	DELETE_ADD_ARCHIVE_SUCCESS: "아카이브 담기 취소 성공",
-	INSERT_ADD_ARCHIVE_FAIL: "아카이브 담기 실패",
-	INSERT_ADD_ARCHIVE_SUCCESS: "아카이브 담기 성공",
+	INSERT_ADD_ARCHIVE_FAIL: "스크랩 실패",
+	INSERT_ADD_ARCHIVE_SUCCESS: "스크랩 성공",
 	FIND_ADD_ARCHIVE_SUCCESS: "담은 아카이브 조회 성공",
     FIND_ADD_ARCHIVE_FAIL: "담은 아카이브 조회 실패",
     
@@ -107,6 +108,10 @@ module.exports =  {
 	NOTIFICATION_NOT_EXIST: "알림이 존재하지 않음",
 	NOTIFICATION_POST_SUCCESS: "알림 저장 성공",
 	NOTIFICATION_POST_FAIL: "알림 저장 실패",
-	NO_ARTIC_MANAGER: "관리자가 아닙니다"
+    NO_ARTIC_MANAGER: "관리자가 아닙니다",
+    
+    ARCHIVE_SCRAP_SUCCESS : "아카이브 별 스크랩 여부 조회 성공",
+    ARCHIVE_SCRAP_FAIL : "아카이브 별 스크랩 여부 조회 실패",
+    ARCHIVE_SCRAP_NO : "아카이브 별 스크랩 없음"
 
 }
