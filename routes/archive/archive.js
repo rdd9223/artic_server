@@ -207,7 +207,7 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 			if (insertTransaction === undefined) {
 				res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));
 			} else {
-				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS, result));
+				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS, addArchiveArticleResult));
 			}
 		}
 	}

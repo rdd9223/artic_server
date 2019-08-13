@@ -186,27 +186,30 @@ router.post('/2', authUtils.isLoggedin, async (req, res) => {
 	}
 });
 
-// 24시간 이내 생성된 아티클을 알림으로 저장
-cron.schedule('0 0 8 * * ?', () => {
-	const getNewArticleQuery = 'SELECT article_idx FROM article WHERE date >= ?';
-	const getNewArticleResult = await db.queryParam_Parse(getNewArticleQuery, [moment().subtract(1, 'd')]);
+// 24시간 이내 생성된 아티클을 알림으로 저장 (AM 08:00 알림)
+cron.schedule('0 0 8 * * *', async(result, err) => {
+	const getNewArticleQuery = 'SELECT article_idx FROM article WHERE date > ?';
+	const getNewArticleResult = await db.queryParam_Arr(getNewArticleQuery, [moment().subtract(24, 'hours').format("YYYY-MM-DD HH:mm:SS")]);
+	const getAllUserIdxQuery = 'SELECT user_idx FROM user WHERE user_idx != 1';
+	const getAllUserIdxResult = await db.queryParam_None(getAllUserIdxQuery);
 
-	if(!getNewArticleResult[0]){
-		res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.ARTICLE_ADD_NOTIFICATION_FAIL));
+	if(err){
+		throw err;
 	} else {
-		
+		for (let i = 0, userData; userData = getAllUserIdxResult[i]; i++) {
+			userData.isRead = false;
+		}
+		var articleArr = [];
+		for (let i = 0; i < getNewArticleResult.length; i++){
+			articleArr[i] = getNewArticleResult[i].article_idx;
+		}
+		result = await Notification.createWithDate({
+			user_idx: getAllUserIdxResult,
+			article_idx: articleArr,
+			notification_type: 0
+		});
+		console.log(moment().format("YYYY-MM-DD HH:mm:ss"));
 	}
 })
-
-// cron.schedule('0 0 8 * * ?', () => {
-//     console.log("1분마다 실행");
-//     console.log(moment().format('YYYY-MM-DD HH:mm:ss')) // moment() 꼭 괄호열고 괄호 닫아야함
-//     console.log(`신입생 OT 이후 ${moment().diff(moment('2019-03-23'),"days")}일 지남`);
-// });
-
-// cron.schedule('*/10 * * * *', () => {
-//     console.log('10분마다 실행');
-//     console.log(`30일 후 날짜 => ${moment().add(30,"days").format("YYYY년 MM월 D일")}`)
-// });
 
 module.exports = router;
