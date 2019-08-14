@@ -9,7 +9,7 @@ const notificationSchema = new mongoose.Schema({
 	date: { type: Date },
     user_idx: { type: Array, required: true},
 	article_idx: { type: Array, required: true},
-	string_type: { type: Number , default: null}
+	string_type: { type: String , default: null}
 }, {
     versionKey: false
 });
@@ -32,7 +32,8 @@ notificationSchema.statics.createWithDate = function(user){
 		'user_idx': user.user_idx,
 		'article_idx': user.article_idx,
 		'notification_type': user.notification_type,
-		'date': moment().format('YYYY-MM-DD HH:mm:ss')
+		'date': moment().add(9, 'hours').format('YYYY-MM-DD HH:mm:ss'),
+		'string_type': user.string_type
 	})
 }
 // user_idx,
