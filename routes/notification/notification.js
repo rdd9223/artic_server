@@ -25,9 +25,10 @@ router.get('/', /*authUtils.isLoggedin,*/ async (req, res) => {
 	const userIdx = 2 //req.decoded.idx;
 	//오름차순 = 1, 내림차순 = -1
 	Notification.find({
-			'user_idx.user_idx': userIdx,
-			'isRead': false
+			'user_idx.user_idx': userIdx
+			//,'user_idx.isRead': false
 		}).sort({
+			'user_idx.isRead': 1,
 			date: -1
 		})
 		.then(async (result) => {
