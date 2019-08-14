@@ -189,10 +189,12 @@ router.post('/2', authUtils.isLoggedin, async (req, res) => {
 });
 
 // 아틱 로그인 시 안내문 발송
+router.get('/3', async(req, res) =>{
 
+})
 
 // 24시간 이내 생성된 아티클을 알림으로 저장 (AM 08:00 알림)
-cron.schedule('0 0 8 * * *', async (result, err) => {
+cron.schedule('*/5 * * * * *', async (result, err) => {
 	if (err) {
 		throw err;
 	} else {
@@ -208,10 +210,12 @@ cron.schedule('0 0 8 * * *', async (result, err) => {
 		for (let i = 0; i < getNewArticleResult.length; i++) {
 			articleArr[i] = getNewArticleResult[i].article_idx;
 		}
+		var randomNum = Math.floor(Math.random()*(5));
 		result = await Notification.createWithDate({
 			user_idx: getAllUserIdxResult,
 			article_idx: articleArr,
-			notification_type: 0
+			notification_type: 0,
+			string_type: randomNum
 		});
 		console.log(moment().format("YYYY-MM-DD HH:mm:ss"));
 	}
