@@ -22,10 +22,11 @@ const moment = require('moment');
 
 // 모든 알림 불러오기
 router.get('/', /*authUtils.isLoggedin,*/ async (req, res) => {
-	const userIdx = 2//req.decoded.idx;
+	const userIdx = 2 //req.decoded.idx;
 	//오름차순 = 1, 내림차순 = -1
 	Notification.find({
-			'user_idx.user_idx': userIdx
+			'user_idx.user_idx': userIdx,
+			'isRead': false
 		}).sort({
 			date: -1
 		})
@@ -45,7 +46,7 @@ router.get('/', /*authUtils.isLoggedin,*/ async (req, res) => {
 							break;
 						}
 					}
-					while(count<articles.length){
+					while (count < articles.length) {
 						count++;
 					}
 					data.article_idx = result[i].article_idx;
@@ -68,12 +69,14 @@ router.get('/', /*authUtils.isLoggedin,*/ async (req, res) => {
 // 읽음 변경 통신
 // header: _id(해당 알림 id값 주세용)
 router.put('/read', /*authUtils.isLoggedin,*/ async (req, res) => {
-	const userIdx = 2//req.decoded.idx;
+	const userIdx = 2 //req.decoded.idx;
 	Notification.updateMany({
-		"user_idx.user_idx": userIdx,
-		"_id": req.get('_id')
-	}, {
-		$set: { "user_idx.$.isRead": true }
+			"user_idx.user_idx": userIdx,
+			"_id": req.get('_id')
+		}, {
+			$set: {
+				"user_idx.$.isRead": true
+			}
 		}, {},
 		(err, updateResult) => {
 			if (err) {
@@ -86,7 +89,7 @@ router.put('/read', /*authUtils.isLoggedin,*/ async (req, res) => {
 
 // 추천 알림 (마지막 읽은 아티클의 카테고리 중, 무작위 5개(안 읽은 것))
 router.post('/1', authUtils.isLoggedin, async (req, res) => {
-	const userIdx = req.decoded.idx 
+	const userIdx = req.decoded.idx
 	if (userIdx == 1) {
 		const getAllUserIdxQuery = 'SELECT user_idx FROM user WHERE user_idx != ?'
 		const getRecentViewArticleQuery = 'SELECT article_idx FROM `read` WHERE user_idx = ? ORDER BY date DESC LIMIT 1';
@@ -136,7 +139,6 @@ router.post('/1', authUtils.isLoggedin, async (req, res) => {
 	} else {
 		res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.NO_ARTIC_MANAGER));
 	}
-
 })
 
 // 읽지않은 아티클 알림 등록
@@ -151,7 +153,7 @@ router.post('/2', authUtils.isLoggedin, async (req, res) => {
 			articleResult = [];
 		for (let i = 0, j = 0; i < getAllUserIdxResult.length; i++) {
 			const getNotReadArticleIdxResult = await db.queryParam_Arr(getNotReadArticleIdxQuery, [getAllUserIdxResult[i].user_idx, getAllUserIdxResult[i].user_idx]);
-			
+
 			console.log(getNotReadArticleIdxResult)
 			if (getNotReadArticleIdxResult.length != 0) {
 				userResult[j] = getAllUserIdxResult[i].user_idx;
@@ -186,21 +188,24 @@ router.post('/2', authUtils.isLoggedin, async (req, res) => {
 	}
 });
 
-// 24시간 이내 생성된 아티클을 알림으로 저장 (AM 08:00 알림)
-cron.schedule('0 0 8 * * *', async(result, err) => {
-	const getNewArticleQuery = 'SELECT article_idx FROM article WHERE date > ?';
-	const getNewArticleResult = await db.queryParam_Arr(getNewArticleQuery, [moment().subtract(24, 'hours').format("YYYY-MM-DD HH:mm:SS")]);
-	const getAllUserIdxQuery = 'SELECT user_idx FROM user WHERE user_idx != 1';
-	const getAllUserIdxResult = await db.queryParam_None(getAllUserIdxQuery);
+// 아틱 로그인 시 안내문 발송
 
-	if(err){
+
+// 24시간 이내 생성된 아티클을 알림으로 저장 (AM 08:00 알림)
+cron.schedule('0 0 8 * * *', async (result, err) => {
+	if (err) {
 		throw err;
 	} else {
+		const getNewArticleQuery = 'SELECT article_idx FROM article WHERE date > ?';
+		const getNewArticleResult = await db.queryParam_Arr(getNewArticleQuery, [moment().subtract(24, 'hours').format("YYYY-MM-DD HH:mm:SS")]);
+		const getAllUserIdxQuery = 'SELECT user_idx FROM user WHERE user_idx != 1';
+		const getAllUserIdxResult = await db.queryParam_None(getAllUserIdxQuery);
+
 		for (let i = 0, userData; userData = getAllUserIdxResult[i]; i++) {
 			userData.isRead = false;
 		}
 		var articleArr = [];
-		for (let i = 0; i < getNewArticleResult.length; i++){
+		for (let i = 0; i < getNewArticleResult.length; i++) {
 			articleArr[i] = getNewArticleResult[i].article_idx;
 		}
 		result = await Notification.createWithDate({
