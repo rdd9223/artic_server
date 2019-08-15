@@ -189,11 +189,6 @@ router.post('/2', authUtils.isLoggedin, async (req, res) => {
 	}
 });
 
-// 아틱 로그인 시 안내문 발송
-router.get('/3', async(req, res) =>{
-
-})
-
 // 24시간 이내 생성된 아티클을 알림으로 저장 (AM 08:00 알림)
 cron.schedule('0 0 8 * * *', async (result, err) => {
 	if (err) {
@@ -204,20 +199,24 @@ cron.schedule('0 0 8 * * *', async (result, err) => {
 		const getAllUserIdxQuery = 'SELECT user_idx FROM user WHERE user_idx != 1';
 		const getAllUserIdxResult = await db.queryParam_None(getAllUserIdxQuery);
 
-		for (let i = 0, userData; userData = getAllUserIdxResult[i]; i++) {
-			userData.isRead = false;
+		if (!getNewArticleResult[0]) {
+			console.log(NOT_FIND_ARTICLE);
+		} else {
+			for (let i = 0, userData; userData = getAllUserIdxResult[i]; i++) {
+				userData.isRead = false;
+			}
+			var articleArr = [];
+			for (let i = 0; i < getNewArticleResult.length; i++) {
+				articleArr[i] = getNewArticleResult[i].article_idx;
+			}
+			result = await Notification.createWithDate({
+				user_idx: getAllUserIdxResult,
+				article_idx: articleArr,
+				notification_type: 0,
+				string_type: Math.floor(Math.random() * 5)
+			});
 		}
-		var articleArr = [];
-		for (let i = 0; i < getNewArticleResult.length; i++) {
-			articleArr[i] = getNewArticleResult[i].article_idx;
-		}
-		result = await Notification.createWithDate({
-			user_idx: getAllUserIdxResult,
-			article_idx: articleArr,
-			notification_type: 0,
-			string_type: Math.floor(Math.random() * 5)
-		});
-		console.log(moment().format("YYYY-MM-DD HH:mm:ss"));
+
 	}
 })
 

@@ -7,7 +7,6 @@ const db = require('../../modules/pool');
 const jwt = require('../../modules/jwt');
 const PythonShell = require('python-shell');
 const authUtils = require('../../modules/utils/authUtils');
-const Notification = require('../../models/notificationSchema');
 const aws = require('aws-sdk');
 const upload = require('../../config/multer')
 var moment = require('moment');

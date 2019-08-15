@@ -61,8 +61,6 @@ module.exports =  {
     LIKE_ARTICLE_SUCCESS: "아티클 좋아요 성공",
     UNLIKE_ARTICLE_FAIL: "아티클 좋아요 취소 실패",
     UNLIKE_ARTICLE_SUCCESS: "아티클 좋아요 취소 성공",
-    ARTICLE_ADD_NOTIFICATION_FAIL: "아티클 알림 등록 실패",
-    ARTICLE_ADD_NOTIFICATION_SUCCESS: "아티클 알림 등록 성공",
 
     REGISTER_ARCHIVE_SUCCESS : "아카이브 등록 성공",
     REGISTER_ARCHIVE_FAIL : "아카이브 등록 실패",

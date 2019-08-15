@@ -7,6 +7,7 @@ const statusCode = require('../../modules/utils/statusCode');
 const db = require('../../modules/pool');
 const encrytion = require('../../modules/encrytion/encrytionModule');
 const crypto = require('crypto-promise');
+const Notification = require('../../models/notificationSchema');
 
 //회원가입
 router.post('/', async(req, res) => {
@@ -28,11 +29,10 @@ router.post('/', async(req, res) => {
             res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ALREADY_USER));
         } else {
             const encrytionResult = await encrytion.encrytion(pw);
-
             const insertResult = await db.queryParam_Arr(insertQuery, [id, encrytionResult.hashedPassword, "user", birth, name, encrytionResult.salt]);
             console.log(insertResult);
-
             if (!insertResult) {
+                
                 res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.USER_DB_INSERT_ERROR))
             } else {
                 res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.CREATED_USER, req.body));
