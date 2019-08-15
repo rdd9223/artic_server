@@ -10,7 +10,7 @@ const crypto = require('crypto-promise');
 const Notification = require('../../models/notificationSchema');
 
 //회원가입
-router.post('/', async(req, res) => {
+router.post('/', async (req, res) => {
     const id = req.body.id;
     const pw = req.body.pw;
     const birth = req.body.birth;
@@ -32,9 +32,17 @@ router.post('/', async(req, res) => {
             const insertResult = await db.queryParam_Arr(insertQuery, [id, encrytionResult.hashedPassword, "user", birth, name, encrytionResult.salt]);
             console.log(insertResult);
             if (!insertResult) {
-                
                 res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.USER_DB_INSERT_ERROR))
             } else {
+                const getNewUserQuery = 'SELECT user_idx FROM user WHERE user_id = ?';
+                const getNewUserResult = await db.queryParam_Arr(getNewUserQuery, [id]);
+                
+                getNewUserResult[0].isRead = false
+                result = await Notification.createWithDate({
+                    user_idx: getNewUserResult,
+                    article_idx: 1,
+                    notification_type: 3
+                });
                 res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.CREATED_USER, req.body));
             }
         }

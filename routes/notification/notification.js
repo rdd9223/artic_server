@@ -16,7 +16,7 @@ const moment = require('moment');
 	newArticle = 0
 	recommend = 1
 	notRead = 2
-	firstNotification = 3
+	artic_guide = 3
 */
 // newArticle code --> route/archive/:archive_idx/article
 
