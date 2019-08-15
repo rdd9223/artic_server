@@ -21,12 +21,11 @@ const moment = require('moment');
 // newArticle code --> route/archive/:archive_idx/article
 
 // 모든 알림 불러오기
-router.get('/', /*authUtils.isLoggedin,*/ async (req, res) => {
-	const userIdx = 2 //req.decoded.idx;
+router.get('/', authUtils.isLoggedin, async (req, res) => {
+	const userIdx = req.decoded.idx;
 	//오름차순 = 1, 내림차순 = -1
 	Notification.find({
 			'user_idx.user_idx': userIdx
-			//,'user_idx.isRead': false
 		}).sort({
 			'user_idx.isRead': 1,
 			date: -1
@@ -69,8 +68,8 @@ router.get('/', /*authUtils.isLoggedin,*/ async (req, res) => {
 
 // 읽음 변경 통신
 // header: _id(해당 알림 id값 주세용)
-router.put('/read', /*authUtils.isLoggedin,*/ async (req, res) => {
-	const userIdx = 2 //req.decoded.idx;
+router.put('/read', authUtils.isLoggedin, async (req, res) => {
+	const userIdx = req.decoded.idx;
 	Notification.updateMany({
 			"user_idx.user_idx": userIdx,
 			"_id": req.get('_id')
