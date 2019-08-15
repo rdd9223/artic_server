@@ -7,7 +7,6 @@ const db = require('../../modules/pool');
 const jwt = require('../../modules/jwt');
 const PythonShell = require('python-shell');
 const authUtils = require('../../modules/utils/authUtils');
-const Notification = require('../../models/notificationSchema');
 const aws = require('aws-sdk');
 const upload = require('../../config/multer')
 var moment = require('moment');
@@ -202,23 +201,12 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 				console.log(selectArticleIdxResult[0].article_idx);
 				const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)'; //아카이브아티클
 				const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
-				//새 아티클 알림
-				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
-				const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
-				for (let i = 0, userData; userData = getAddArchiveUserResult[i]; i++) {
-					userData.isRead = false;
-				}
-				result = await Notification.createWithDate({
-					user_idx: getAddArchiveUserResult,
-					article_idx: articleIdx,
-					notification_type: 0
-				});
 			});
 
 			if (insertTransaction === undefined) {
 				res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));
 			} else {
-				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS, result));
+				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS, addArchiveArticleResult));
 			}
 		}
 	}
