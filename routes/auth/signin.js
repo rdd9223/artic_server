@@ -6,7 +6,7 @@ const statusCode = require('../../modules/utils/statusCode');
 const db = require('../../modules/pool');
 const encrytion = require('../../modules/encrytion/encrytionModule');
 const jwt = require('../../modules/jwt');
-const secretOrPrivateKey = "articKey!";
+
 //로그인
 router.post('/', async (req, res) => {
 	const id = req.body.id;

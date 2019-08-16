@@ -14,6 +14,7 @@ router.get('/', async (req, res) => {
 	if (!getAllCategoryResult) {
 		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.CATEGORY_SELECT_FAIL));
 	} else {
+		console.log("헤이헤이")
 		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.CATEGORY_SELECT_SUCCESS, getAllCategoryResult));
 	}
 })

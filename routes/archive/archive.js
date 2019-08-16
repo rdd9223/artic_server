@@ -103,20 +103,27 @@ router.put('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 router.delete('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const idx = req.params.archive_idx;
 	let user_idx = req.decoded.idx;
-	const getUserIdx = await db.queryParam_Arr('SELECT user_idx FROM archive WHERE user_idx = ?', [user_idx]);
-	const getArchiveCount = await db.queryParam_Arr('SELECT COUNT(*) count FROM archive WHERE user_idx = ?', [user_idx])
+	const getUserIdx = await db.queryParam_Arr('SELECT user_idx FROM artic.archive WHERE user_idx = ?', [user_idx]);
+	const getArchiveIdx = await db.queryParam_Arr('SELECT * FROM artic.archive WHERE user_idx = ?', [user_idx])
+	console.log(getUserIdx.length);
+
 	if (getUserIdx.length == 0) {
+		//해당유저의 아카이브가 없을떄
 		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.ARCHIVE_NO))
 	} else {
-		if (user_idx != getUserIdx[0].user_idx) { //사용자가 같지 않을때
-			console.log("권한 틀릴때")
-			res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
-		} else if (user_idx = getUserIdx[0].user_idx) {
-			console.log("권한 맞을떄")
+		// if (user_idx != getUserIdx[0].user_idx) { //사용자가 같지 않을때
+		// 	res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
+		// } else 
+		if (idx == getArchiveIdx[0].archive_idx) {
+			console.log("[[["+ idx);
+			console.log("}]]]]"+ getArchiveIdx[0].archive_idx)
+			console.log("해당유저의 맞는 아카이브 찾았을때");
 			const deleteArchive = 'DELETE FROM archive WHERE archive_idx = ? AND user_idx = ?';
 			const deleteArchiveResult = await db.queryParam_Parse(deleteArchive, [idx, user_idx]);
 			res.status(200).send(utils.successTrue(statusCode.OK, resMessage.DELETE_ARCHIVE_SUCCESS));
-		} else if (user_idx = 1) { //관리자는 다 삭제가능
+		} else if(idx != getArchiveIdx[0].archive_idx){
+			res.status(200).send(utils.successTrue(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY));
+		}else if (user_idx == 1) { //관리자는 다 삭제가능
 			console.log("관리자 삭제가능")
 			const deleteArchive = 'DELETE FROM archive WHERE archive_idx = ?';
 			const deleteArchiveResult = await db.queryParam_Arr(deleteArchive, [idx]);
