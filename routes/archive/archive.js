@@ -81,8 +81,21 @@ router.put('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const archive_img = req.body.img;
 	const category_idx = req.body.category_idx;
 	const date = moment().format('YYYY-MM-DD HH:mm:ss');
+	// 아카이브 인덱스가 유저가 만든 아카이브 인덱스인지 확인
+	// 맞다면 자기거 수정
 	if (user_idx != 1) {
-		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
+		if (!archive_title) {
+			res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.UPDATE_ARCHIVE_UNOPENED));
+		} else {
+			// res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY));
+			const modifyArchiveTitleQuery = "UPDATE archive SET archive_title = ? WHERE user_idx = ? AND archive_idx = ?";
+			const modifyArchiveTitleResult = db.queryParam_Arr(modifyArchiveTitleQuery, [archive_title, user_idx, archive_idx]);
+			if(!modifyArchiveTitleResult){
+				res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.UPDATE_ARCHIVE_FAIL));
+			} else {
+				res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.UPDATE_ARCHIVE_SUCCESS));
+			}
+		}
 	} else {
 		const updateArchive = 'UPDATE archive SET archive_title = ?, date = ?, archive_img = ?, category_idx = ? WHERE user_idx = ? AND archive_idx = ?'
 		const InsertArchiveResult = await db.queryParam_Parse(updateArchive, [archive_title, date, archive_img, category_idx, user_idx, archive_idx]);
@@ -97,6 +110,7 @@ router.put('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 		}
 	}
 });
+
 //아카이브 삭제
 //자기 아카이브만 지울 수 있도록 해야함
 router.delete('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
