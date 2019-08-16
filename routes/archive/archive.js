@@ -7,7 +7,6 @@ const db = require('../../modules/pool');
 const jwt = require('../../modules/jwt');
 const PythonShell = require('python-shell');
 const authUtils = require('../../modules/utils/authUtils');
-const Notification = require('../../models/notificationSchema');
 const aws = require('aws-sdk');
 const upload = require('../../config/multer')
 var moment = require('moment');
@@ -82,8 +81,21 @@ router.put('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 	const archive_img = req.body.img;
 	const category_idx = req.body.category_idx;
 	const date = moment().format('YYYY-MM-DD HH:mm:ss');
+	// 아카이브 인덱스가 유저가 만든 아카이브 인덱스인지 확인
+	// 맞다면 자기거 수정
 	if (user_idx != 1) {
-		res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY))
+		if (!archive_title) {
+			res.status(200).send(utils.successFalse(statusCode.SERVICE_UNAVAILABLE, resMessage.UPDATE_ARCHIVE_UNOPENED));
+		} else {
+			// res.status(200).send(utils.successFalse(statusCode.FORBIDDEN, resMessage.NO_DELETE_AUTHORITY));
+			const modifyArchiveTitleQuery = "UPDATE archive SET archive_title = ? WHERE user_idx = ? AND archive_idx = ?";
+			const modifyArchiveTitleResult = db.queryParam_Arr(modifyArchiveTitleQuery, [archive_title, user_idx, archive_idx]);
+			if(!modifyArchiveTitleResult){
+				res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.UPDATE_ARCHIVE_FAIL));
+			} else {
+				res.status(200).send(utils.successTrue(statusCode.CREATED, resMessage.UPDATE_ARCHIVE_SUCCESS));
+			}
+		}
 	} else {
 		const updateArchive = 'UPDATE archive SET archive_title = ?, date = ?, archive_img = ?, category_idx = ? WHERE user_idx = ? AND archive_idx = ?'
 		const InsertArchiveResult = await db.queryParam_Parse(updateArchive, [archive_title, date, archive_img, category_idx, user_idx, archive_idx]);
@@ -98,6 +110,7 @@ router.put('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
 		}
 	}
 });
+
 //아카이브 삭제
 //자기 아카이브만 지울 수 있도록 해야함
 router.delete('/:archive_idx', authUtils.isLoggedin, async (req, res) => {
@@ -209,23 +222,12 @@ router.post('/:archive_idx/article', authUtils.isLoggedin, async (req, res) => {
 				console.log(selectArticleIdxResult[0].article_idx);
 				const addArchiveArticleQuery = 'INSERT INTO archiveArticle (article_idx, archive_idx) VALUES (?, ?)'; //아카이브아티클
 				const addArchiveArticleResult = await connection.query(addArchiveArticleQuery, [articleIdx, archiveIdx]);
-				//새 아티클 알림
-				const getAddArchiveUserQuery = 'SELECT user_idx FROM archiveAdd WHERE archive_idx = ?';
-				const getAddArchiveUserResult = await db.queryParam_Arr(getAddArchiveUserQuery, [archiveIdx]);
-				for (let i = 0, userData; userData = getAddArchiveUserResult[i]; i++) {
-					userData.isRead = false;
-				}
-				result = await Notification.createWithDate({
-					user_idx: getAddArchiveUserResult,
-					article_idx: articleIdx,
-					notification_type: 0
-				});
 			});
 
 			if (insertTransaction === undefined) {
 				res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ADD_ARTICLE_FAIL));
 			} else {
-				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS, result));
+				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.ADD_ARTICLE_SUCCESS, addArchiveArticleResult));
 			}
 		}
 	}
@@ -344,10 +346,29 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
 				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.SCRAP_ARTICLE_SUCCESS));
 			}
 		}
-
 	}
 });
-
 //아티클 담기 취소
+router.delete('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async(req, res) => {
+	const articleIdx = req.params.article_idx;
+	const archiveIdx = req.params.archive_idx;
+	const userIdx = req.decoded.idx;
+
+	const selectArchiveQuery = 'SELECT archive_idx FROM archive WHERE archive_idx = ? AND user_idx = ?';
+	const selectArchiveResult = db.queryParam_Arr(selectArchiveQuery, [archiveIdx, userIdx]);
+
+	if (selectArchiveResult === undefined) {
+		// 아카이브를 찾을 수 없음
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
+	} else if (selectArchiveResult == 0) {
+		// 아카이브 소유자가 아님
+		res.status(202).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_ARCHIVE_OWNER));
+	} else {
+		const deleteMyArticleQuery = 'DELETE FROM archiveArticle WHERE archive_idx = ? AND article_idx = ?';
+		const deleteMyArticleResult = db.queryParam_Arr(deleteMyArticleQuery, [archiveIdx, articleIdx]);
+		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.DELETE_ARTICLE_SUCCESS, deleteMyArticleResult));
+	}
+})
+
 // 본인 확인, 
 module.exports = router;

@@ -6,10 +6,9 @@ moment.tz.setDefault("Asia/Seoul");
 
 const notificationSchema = new mongoose.Schema({
 	notification_type: { type: String, required: true},
-	date: { type: Date },
+	date: Date,
     user_idx: { type: Array, required: true},
-	article_idx: { type: Array, required: true},
-	string_type: { type: String , default: null}
+    article_idx: { type: Array, required: true}
 }, {
     versionKey: false
 });
@@ -29,18 +28,17 @@ notificationSchema.statics.updateFlag = function(user_idx){
 
 notificationSchema.statics.createWithDate = function(user){
 	return this.create({
-		'user_idx': user.user_idx,
-		'article_idx': user.article_idx,
-		'notification_type': user.notification_type,
-		'date': moment().add(9, 'hours').format('YYYY-MM-DD HH:mm:ss'),
-		'string_type': user.string_type
+		'user_idx': userData,
+		'article_idx': articleArr,
+		'notification_type': num,
+		'date': moment().format('YYYY-MM-DD HH:mm:ss')
 	})
 }
 // user_idx,
 // 'article_idx' : article_idx,
 // 'notification_type' : notification_type
-notificationSchema.pre('save', function() { 
-    if (!this.date) this.date = moment().format('YYYY-MM-DD HH:mm:ss');
+notificationSchema.pre('save', function(next) { 
+    this.date = moment().format('YYYY-MM-DD HH:mm:ss');
 });
 
 module.exports = mongoose.model('notification', notificationSchema);
