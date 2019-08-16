@@ -339,10 +339,29 @@ router.post('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async (r
 				res.status(200).send(utils.successTrue(statusCode.OK, resMessage.SCRAP_ARTICLE_SUCCESS));
 			}
 		}
-
 	}
 });
-
 //아티클 담기 취소
+router.delete('/:archive_idx/article/:article_idx', authUtils.isLoggedin, async(req, res) => {
+	const articleIdx = req.params.article_idx;
+	const archiveIdx = req.params.archive_idx;
+	const userIdx = req.decoded.idx;
+
+	const selectArchiveQuery = 'SELECT archive_idx FROM archive WHERE archive_idx = ? AND user_idx = ?';
+	const selectArchiveResult = db.queryParam_Arr(selectArchiveQuery, [archiveIdx, userIdx]);
+
+	if (selectArchiveResult === undefined) {
+		// 아카이브를 찾을 수 없음
+		res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_FIND_ARCHIVE));
+	} else if (selectArchiveResult == 0) {
+		// 아카이브 소유자가 아님
+		res.status(202).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NOT_ARCHIVE_OWNER));
+	} else {
+		const deleteMyArticleQuery = 'DELETE FROM archiveArticle WHERE archive_idx = ? AND article_idx = ?';
+		const deleteMyArticleResult = db.queryParam_Arr(deleteMyArticleQuery, [archiveIdx, articleIdx]);
+		res.status(200).send(utils.successTrue(statusCode.OK, resMessage.DELETE_ARTICLE_SUCCESS, deleteMyArticleResult));
+	}
+})
+
 // 본인 확인, 
 module.exports = router;
