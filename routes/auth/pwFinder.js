@@ -6,33 +6,44 @@ const statusCode = require('../../modules/utils/statusCode');
 const utils = require('../../modules/utils/utils');
 const authUtils = require('../../modules/utils/authUtils');
 const nodemailer = require('nodemailer');
+var smtpTransport = require('nodemailer-smtp-transport');
+
 
 router.post('/', async (req, res) => {
     let email = req.body.email;
+    const id = req.body.id;
+    const pw = req.body.pw;
+    
+    //회원정보 확인
+    const getAdmin = 'SELECT * FROM user WHERE user_id = ?'
+	const getAdminResult = await db.queryParam_Arr(getAdmin, [id]);
 
-    let transporter = nodemailer.createTransport({
+
+    //메일 발송객체 생성
+    let transporter = nodemailer.createTransport(smtpTransport({
         service: 'gmail',
+        host: 'smtp.gmail.com',
         auth: {
-            user: 'rdd9223@gmail.com',
-            pass: 'asd970712!@'
+            user: 'hyeong412@gmail.com',
+            pass: 'Dbgusdud412!'
         }
-    })
+    }));
     
     var mailOptions = {
-        from: 'rdd9223@gmail.com',
-        to: 'rdd9223@naver.com',
-        subject: "실험 이메일",
-        text: "재밌당 ㅎㅎ"
+        from: 'articrew',
+        to: email,
+        subject: "비밀번호 인증코드",
+        text: "랜덤 코드 보내기"
     }
 
     transporter.sendMail(mailOptions, (err, info) => {
         if(err){
             console.log(err);
         } else {
-            console.log("Message sent: " + info.response)
+            console.log("Message sent: " + info.response);
         }
-    })
+    });
     transporter.close(); // 종료
-})
+});
 
 module.exports = router;
