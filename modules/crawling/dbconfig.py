@@ -9,7 +9,7 @@ import tldextract
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
 
-# 403에러시 헤더처리 하기
+# 403에러시 헤더 처리 하기
 headers = {'User-Agent': 'Mozilla/5.0'}  
 res = requests.get(sys.argv[1] , headers=headers)
 link = sys.argv[1]
@@ -26,6 +26,7 @@ date = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
 
 #tmp = link.split('/')
 #domain = tmp[2]
+#도메인 추출
 extracted = tldextract.extract(link)
 domain = "{}.{}".format(extracted.domain, extracted.suffix)
 
@@ -34,6 +35,7 @@ print(output)
 print(link)
 print(date)
 print(domain)
+
 # Connect to the database
 conn = pymysql.connect(host='artic.cvvhkxkqobt2.ap-northeast-2.rds.amazonaws.com',
                        user='rdd9223',
